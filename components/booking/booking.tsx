@@ -49,7 +49,7 @@ export function BookingFlow() {
   const [ready, setReady] = useState(false)
   const [step, setStep] = useState(1)
   const [tab, setTab] = useState<'activity' | 'course'>('activity')
-  const [cart, setCart] = useState<Cart>({ date: '', group: 2, items: [] })
+  const [cart, setCart] = useState<Cart>({ date: '', group: 1, items: [] })
   const [customer, setCustomer] = useState({ name: '', phone: '', email: '' })
   const [tried, setTried] = useState(false)
   const [note, setNote] = useState('')
@@ -82,8 +82,8 @@ export function BookingFlow() {
     const o = findOption(q.get('activity'))
     const d = q.get('date'); const g = Number(q.get('guests'))
     const min = iso(new Date())
-    let next: Cart = returning && saved.cart && Array.isArray(saved.cart.items) ? saved.cart : { date: '', group: 2, items: [] }
-    if (!(next.group >= 1 && next.group <= MAX_GROUP)) next = { ...next, group: 2 }
+    let next: Cart = returning && saved.cart && Array.isArray(saved.cart.items) ? saved.cart : { date: '', group: 1, items: [] }
+    if (!(next.group >= 1 && next.group <= MAX_GROUP)) next = { ...next, group: 1 }
     if (next.date && next.date < min) next = { ...next, date: '' }
     const group = next.group
     next = { ...next, items: next.items.filter(i => optionOf(i.slug)).map(i => ({ ...i, people: Math.min(Math.max(1, i.people), group) })) }

@@ -3,7 +3,7 @@
 import Image from '@/components/ui/photo'
 import { usePathname, useRouter } from 'next/navigation'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
-import { ArrowRight, Phone, X } from 'lucide-react'
+import { ArrowRight, Expand, Phone, X } from 'lucide-react'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { experiences } from '@/data/experiences'
 import { courses } from '@/data/courses'
@@ -13,6 +13,9 @@ import { Picker } from '@/components/booking/picker'
 const KEY = 'bs-booking-popup-seen'
 const ease = [0.19, 1, 0.22, 1] as const
 const activityGroups = [{ label: 'Activities', options: experiences.map(e => ({ value: e.title })) }, { label: 'Courses', options: courses.map(c => ({ value: c.title })) }]
+// Everything the popup can book, by title, so its photo and details follow the chosen activity
+const items = [...experiences.map(e => ({ title: e.title, kind: e.category, image: e.image, position: e.imagePosition, tagline: e.tagline, facts: [e.duration, e.price] })), ...courses.map(c => ({ title: c.title, kind: c.level, image: c.image, position: c.imagePosition, tagline: c.tagline, facts: [c.duration, c.price] }))]
+const itemOf = (title: string) => items.find(i => i.title === title) ?? items[0]
 const guestGroups = [{ options: [1, 2, 3, 4].map(n => ({ value: String(n), label: `${n} ${n === 1 ? 'guest' : 'guests'}` })) }]
 
 // Detail pages map to the item they show, so the popup can open with it preselected
@@ -37,6 +40,11 @@ export function BookingPopup() {
   const reduce = useReducedMotion()
   const preset = detailTitle(pathname)
   const [open, setOpen] = useState(false)
+  const [activity, setActivity] = useState(preset ?? experiences[0].title)
+  const [full, setFull] = useState(false)
+  const fullRef = useRef(false)
+  fullRef.current = full
+  const item = itemOf(activity)
   const dialog = useRef<HTMLDivElement>(null)
   const lastFocus = useRef<HTMLElement | null>(null)
   const today = new Date().toISOString().slice(0, 10)
@@ -44,6 +52,8 @@ export function BookingPopup() {
 
   // Navigating away closes it, so it never carries over onto the next page
   useEffect(() => { setOpen(false) }, [pathname])
+  // Each opening starts from the page's own activity, with the photo in its frame
+  useEffect(() => { if (open) { setActivity(preset ?? experiences[0].title); setFull(false) } }, [open, preset])
 
   useEffect(() => {
     if (pathname.startsWith('/booking')) { markShown(KEY); return }
@@ -78,7 +88,8 @@ export function BookingPopup() {
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') close()
+      // Escape first leaves the full-size photo, then closes the popup
+      if (e.key === 'Escape') { if (fullRef.current) setFull(false); else close() }
       if (e.key === 'Tab' && dialog.current) {
         const f = dialog.current.querySelectorAll<HTMLElement>('button, select, input, a[href]')
         const first = f[0], last = f[f.length - 1]
@@ -106,9 +117,19 @@ export function BookingPopup() {
       <m.div ref={dialog} className="bp-dialog" role="dialog" aria-modal="true" aria-labelledby="bp-title" onClick={e => e.stopPropagation()}
         initial={reduce ? { opacity: 0 } : { opacity: 0, y: 60, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={reduce ? { opacity: 0 } : { opacity: 0, y: 30, scale: 0.98 }} transition={{ duration: 0.9, ease }}>
         <button className="bp-close" onClick={() => close()} aria-label="Close"><X /></button>
-        <div className="bp-media">
-          <m.div className="bp-media-inner" initial={reduce ? false : { scale: 1.2 }} animate={{ scale: 1 }} transition={{ duration: 2.2, ease }}><Image src="/images/scuba.webp" alt="" fill sizes="(max-width: 800px) 100vw, 420px" /></m.div>
-          <div className="bp-media-text"><span>Kovalam · Kerala</span><p>Feel the marvels<br /><i>hidden beneath.</i></p></div>
+        <div className="bp-media" onClick={() => setFull(true)}>
+          <AnimatePresence initial={false}>
+            <m.div key={item.image} className="bp-media-inner" initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 1.2 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ opacity: { duration: 0.5 }, scale: { duration: 2.2, ease } }}><span className="bp-media-bg"><Image src={item.image} alt="" fill sizes="120px" /></span><span className="bp-media-fit"><Image src={item.image} alt="" fill sizes="(max-width: 800px) 100vw, 420px" /></span></m.div>
+          </AnimatePresence>
+          <button type="button" className="bp-expand" onClick={() => setFull(true)} aria-label={`View the ${item.title} photo full size`}><Expand /></button>
+          <AnimatePresence mode="wait" initial={false}>
+            <m.div key={item.title} className="bp-media-text" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.45, ease }}>
+              <span>{item.kind} · Kovalam</span>
+              <p>{item.title}</p>
+              <small>{item.tagline}</small>
+              <ul>{item.facts.filter(Boolean).map(f => <li key={f}>{f}</li>)}</ul>
+            </m.div>
+          </AnimatePresence>
         </div>
         <form className="bp-form" onSubmit={submit}>
           <m.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease, delay: 0.25 }}>
@@ -117,9 +138,9 @@ export function BookingPopup() {
             <p className="bp-sub">No diving experience needed. Choose an adventure and we’ll take care of the rest.</p>
           </m.div>
           <m.div className="bp-fields" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease, delay: 0.4 }}>
-            <Picker className="bp-wide" label="Activity" name="activity" groups={activityGroups} defaultValue={preset ?? experiences[0].title} />
+            <Picker className="bp-wide" label="Activity" name="activity" groups={activityGroups} defaultValue={preset ?? experiences[0].title} onChange={setActivity} />
             <label>Date<input name="date" type="date" min={today} defaultValue={today} /></label>
-            <Picker label="Guests" name="guests" groups={guestGroups} defaultValue="2" />
+            <Picker label="Guests" name="guests" groups={guestGroups} defaultValue="1" />
           </m.div>
           <m.div className="bp-actions" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, ease, delay: 0.55 }}>
             <button type="submit" className="book-cta"><span className="book-cta-label"><strong>Continue</strong><small>Reserve your spot</small></span><span className="book-cta-icon"><ArrowRight /></span></button>
@@ -128,6 +149,12 @@ export function BookingPopup() {
           <a className="bp-call" href={`tel:${contact.phones[0].replace(/\s/g, '')}`}><Phone /> Or call us · {contact.phones[0]}</a>
         </form>
       </m.div>
+      <AnimatePresence>
+        {full && <m.div className="bp-full" role="dialog" aria-label={`${item.title} photo`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }} onClick={e => { e.stopPropagation(); setFull(false) }}>
+          <m.div className="bp-full-img" initial={reduce ? false : { scale: 0.92 }} animate={{ scale: 1 }} exit={reduce ? undefined : { scale: 0.96 }} transition={{ duration: 0.6, ease }}><Image src={item.image} alt={item.title} fill sizes="960px" /></m.div>
+          <button type="button" className="bp-full-close" onClick={e => { e.stopPropagation(); setFull(false) }} aria-label="Close the full-size photo"><X /></button>
+        </m.div>}
+      </AnimatePresence>
     </m.div>}
   </AnimatePresence>
 }

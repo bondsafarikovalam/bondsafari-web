@@ -11,7 +11,7 @@ export type PickerGroup = { label?: string; options: PickerOption[] }
 
 // A styled stand-in for <select>: a button opening a listbox, with the value carried by a hidden input.
 // The list opens upward when there is more room above, and never spills out of a scrolling dialog.
-export function Picker({ label, name, groups, defaultValue = '', placeholder = 'Choose…', className = '' }: { label: string; name: string; groups: PickerGroup[]; defaultValue?: string; placeholder?: string; className?: string }) {
+export function Picker({ label, name, groups, defaultValue = '', placeholder = 'Choose…', className = '', onChange }: { onChange?: (value: string) => void; label: string; name: string; groups: PickerGroup[]; defaultValue?: string; placeholder?: string; className?: string }) {
   const id = useId()
   const box = useRef<HTMLDivElement>(null)
   const list = useRef<HTMLUListElement>(null)
@@ -49,7 +49,7 @@ export function Picker({ label, name, groups, defaultValue = '', placeholder = '
   }, [open, active, place.max])
 
   const show = () => { setActive(Math.max(0, options.findIndex(o => o.value === value))); setOpen(true) }
-  const pick = (v: string) => { setValue(v); setOpen(false) }
+  const pick = (v: string) => { setValue(v); setOpen(false); onChange?.(v) }
   const onKey = (e: KeyboardEvent) => {
     const move = { ArrowDown: 1, ArrowUp: -1 }[e.key]
     if (move) { e.preventDefault(); if (!open) show(); else setActive(a => (a + move + options.length) % options.length) }
