@@ -132,6 +132,10 @@ const awardCard = { hidden: { opacity: 0, y: 60 }, show: (i = 0) => ({ opacity: 
 const awardPhoto = { hidden: { clipPath: 'inset(100% 0% 0% 0%)' }, show: (i = 0) => ({ clipPath: 'inset(0% 0% 0% 0%)', transition: { duration: 1.3, ease, delay: 0.15 + i * 0.15 } }) }
 const awardZoom = { hidden: { scale: 1.3 }, show: (i = 0) => ({ scale: 1, transition: { duration: 1.8, ease, delay: 0.15 + i * 0.15 } }) }
 
+// Blue Chef: the big photo wipes open from the left, the two smaller ones from below, each settling from a zoom in turn
+const chefPhoto = { hidden: (i = 0) => ({ clipPath: i ? 'inset(100% 0% 0% 0% round 16px)' : 'inset(0% 100% 0% 0% round 16px)' }), show: (i = 0) => ({ clipPath: 'inset(0% 0% 0% 0% round 16px)', transition: { duration: 1.3, ease, delay: i * 0.18 } }) }
+const chefZoom = { hidden: { scale: 1.3 }, show: (i = 0) => ({ scale: 1, transition: { duration: 1.8, ease, delay: i * 0.18 } }) }
+
 export function About() {
   const reduce = useReducedMotion()
   const hero = useRef<HTMLElement>(null)
@@ -250,11 +254,11 @@ export function About() {
           <div>
             <h3>{ms.title}</h3><p>{ms.text}</p>
             {ms.feature && <>
-              <div className="ab-timeline-photos">{blueChef.photos.map(ph => <div key={ph.src} className="ab-timeline-photo"><div className="ab-timeline-media"><Image src={ph.src} alt={ph.alt} fill sizes={ph.sizes} /></div></div>)}</div>
-              <figure className="ab-timeline-press">
+              <m.div className="ab-timeline-photos" initial="hidden" whileInView="show" viewport={{ once: true, margin: '-80px' }}>{blueChef.photos.map((ph, i) => <m.div key={ph.src} className="ab-timeline-photo" variants={reduce ? fade : chefPhoto} custom={i}><m.div className="ab-timeline-media" variants={reduce ? fade : chefZoom} custom={i}><Image src={ph.src} alt={ph.alt} fill sizes={ph.sizes} /></m.div></m.div>)}</m.div>
+              <m.figure className="ab-timeline-press" initial="hidden" whileInView="show" viewport={{ once: true, margin: '-60px' }} variants={reduce ? fade : rise}>
                 <a href={blueChef.press.src} target="_blank" rel="noreferrer" aria-label={'Open the ' + blueChef.press.paper + ' clipping full size'}><Image src={blueChef.press.src} alt={blueChef.press.alt} fill sizes="(max-width: 800px) 100vw, 320px" /></a>
                 <figcaption><span>In the press</span><h4>{blueChef.press.paper}</h4><small>{blueChef.press.edition}</small><p>{blueChef.press.text}</p></figcaption>
-              </figure>
+              </m.figure>
             </>}
           </div>
         </m.li>)}
