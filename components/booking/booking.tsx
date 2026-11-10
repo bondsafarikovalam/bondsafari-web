@@ -126,7 +126,8 @@ export function BookingFlow() {
   const canNext = !stepProblems.length && (step < 4 || (nameOk && phoneOk))
 
   // The checkout sells one event at a time: a single activity uses the main button, several get a Pay button each
-  const payable = t.lines.flatMap(l => l.option?.eventSlug && !enquiryOnly.includes(l.option.eventSlug) ? [{ title: l.option.title, eventSlug: l.option.eventSlug }] : [])
+  // Course bookings never pay online: they always go to the team on WhatsApp (lib/booking/cart.ts courseMessage)
+  const payable = isCourse ? [] : t.lines.flatMap(l => l.option?.eventSlug && !enquiryOnly.includes(l.option.eventSlug) ? [{ title: l.option.title, eventSlug: l.option.eventSlug }] : [])
   const payKey = payable.map(p => p.eventSlug).join()
   const payDirect = t.lines.length === 1 && payable.length === 1
   // The widget is a large download, so it starts loading as soon as the guest reaches this step
@@ -271,7 +272,7 @@ export function BookingFlow() {
           {payFailed && <p className="bk-error" role="alert">Online payment couldn’t open. Please try again, or send your request on WhatsApp.</p>}
           {payable.length > 0
             ? <p className="bk-note">{payDirect ? 'Secure checkout opens next, where you choose your date and enter your details for payment.' : 'Each activity is paid separately in a secure checkout, where you choose its date and enter your details.'}{payDirect && !payFailed && <> Prefer to talk first? <button type="button" className="bk-link" onClick={() => canNext ? sendRequest() : setTried(true)}>Send your request on WhatsApp</button>.</>}{!payDirect && ' Or use Book now to send everything to our team on WhatsApp.'}</p>
-            : <p className="bk-note">No payment now. We confirm your slots on WhatsApp first, then share how to pay.</p>}
+            : <p className="bk-note">{isCourse ? 'No payment now. Book on WhatsApp opens WhatsApp with your course details ready to send. We confirm your start date there, then share how to pay.' : 'No payment now. We confirm your slots on WhatsApp first, then share how to pay.'}</p>}
         </m.section>}
       </AnimatePresence>
 
@@ -282,7 +283,7 @@ export function BookingFlow() {
         {step > 1 ? <button type="button" className="bk-back" onClick={() => go(step - 1)} aria-label="Back"><ArrowLeft /></button> : <a className="bk-back" href={`tel:${contact.phones[0].replace(/\s/g, '')}`} aria-label="Call us"><Phone /></a>}
         <div className="bk-total">{cart.items.length ? <><b>{t.total ? inr(t.total) : 'On request'}</b><small>{people(cart.group)} · {t.places} {t.places === 1 ? 'place' : 'places'}</small></> : <><b>Group of {cart.group}</b><small>{cart.date ? longDate(cart.date) : 'Pick a date'}</small></>}</div>
         <button type="button" className={`book-cta book-cta-sm${canNext ? '' : ' is-off'}`} onClick={next}>
-          <span className="book-cta-label"><strong>{step < 4 ? 'Continue' : !payDirect || payFailed ? 'Book now' : paying ? 'Opening…' : 'Pay now'}</strong></span>
+          <span className="book-cta-label"><strong>{step < 4 ? 'Continue' : isCourse ? 'Book on WhatsApp' : !payDirect || payFailed ? 'Book now' : paying ? 'Opening…' : 'Pay now'}</strong></span>
           <span className="book-cta-icon"><ArrowRight /></span>
         </button>
       </div>

@@ -103,9 +103,41 @@ export function problems(cart: Cart, step: number): string[] {
 const longDate = (s: string) => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) }
 export { longDate }
 
-export function requestMessage(cart: Cart, customer: { name: string; phone: string; email: string }) {
+type Customer = { name: string; phone: string; email: string }
+const peopleText = (n: number) => `${n} ${n === 1 ? 'person' : 'people'}`
+
+// Course bookings always go to the team on WhatsApp; *bold* and line breaks render as formatting in WhatsApp
+export function courseMessage(cart: Cart, customer: Customer) {
+  const t = totals(cart)
+  return [
+    '🤿 *New Course Booking*',
+    '_Bond Safari Kovalam_',
+    '',
+    `📅 *Start date:* ${longDate(cart.date)}`,
+    `👥 *Group:* ${peopleText(cart.group)}`,
+    '',
+    `📚 *${t.lines.length === 1 ? 'Course' : 'Courses'}*`,
+    ...t.lines.flatMap((l, n) => [
+      `${n + 1}. *${l.option?.title ?? l.item.slug}*`,
+      l.option?.duration ? `    ⏱ ${l.option.duration}` : null,
+      `    👤 ${peopleText(l.item.people)}${l.unit ? ` × ${inr(l.unit)} = *${inr(l.subtotal)}*` : ' · price on request'}`,
+    ]),
+    '',
+    t.total ? `💰 *Total:* ${inr(t.total)}${t.unpriced.length ? ' + courses priced on request' : ''}` : '💰 *Total:* on request',
+    '',
+    '🙋 *Student details*',
+    `Name: ${customer.name.trim()}`,
+    `WhatsApp: ${customer.phone.trim()}`,
+    customer.email.trim() ? `Email: ${customer.email.trim()}` : null,
+    '',
+    'Please confirm the start date and share the payment details. Thank you!',
+  ].filter(line => line !== null).join('\n')
+}
+
+export function requestMessage(cart: Cart, customer: Customer) {
   const t = totals(cart)
   const course = t.lines.length > 0 && t.lines.every(l => l.option?.kind === 'course')
+  if (course) return courseMessage(cart, customer)
   return [
     `Hello Bond Safari! I’d like to book for ${course ? 'a start date of ' : ''}${longDate(cart.date)}:`,
     `Group: ${cart.group} ${cart.group === 1 ? 'person' : 'people'}`,
