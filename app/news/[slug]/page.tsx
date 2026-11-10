@@ -51,7 +51,13 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           {contents.length > 1 && <nav aria-label="In this story"><p className="bl-aside-label">In this story</p><ol>{contents.map(h => <li key={h}><a href={`#${headingId(h)}`}>{h}</a></li>)}</ol></nav>}
           {alsoIn.length > 0 && <nav aria-label="Also covered by"><p className="bl-aside-label">Also covered by</p><ul className="bl-aside-outlets">{alsoIn.slice(0, 6).map(x => <li key={x.slug}><Link href={`/news/${x.slug}`}>{x.outlet}<ArrowRight /></Link></li>)}</ul></nav>}
         </div>
-        <div className="bl-aside-card is-dark">
+        {/* <div className="bl-aside-card is-dark">
+          <p className="bl-aside-label">Be part of the story</p>
+          <p className="bl-aside-title">Feel the marvels <i>hidden beneath.</i></p>
+          <Link className="book-cta" href="/booking?activity=scuba-diving"><span className="book-cta-label"><strong>Dive with us</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link>
+          <a className="bl-aside-call" href={`tel:${contact.phones[0].replace(/\s/g, '')}`}><Phone /> {contact.phones[0]}</a>
+        </div> */}
+           <div className="bl-aside-card is-dark">
           <p className="bl-aside-label">Be part of the story</p>
           <p className="bl-aside-title">Feel the marvels <i>hidden beneath.</i></p>
           <Link className="book-cta" href="/booking?activity=scuba-diving"><span className="book-cta-label"><strong>Dive with us</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link>
