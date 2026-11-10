@@ -4,7 +4,7 @@ import { courseNext, homeCategoryOf, levelOf, listingOf, programmeOf, programmes
 import { Detail, type RelatedItem } from '@/components/pages/detail'
 import { JsonLd, breadcrumbLd, faqLd } from '@/lib/seo'
 import { courseRecords, getEventRecord, listCourses, listEvents } from '@/lib/api/events-server'
-import { coverIn, eventToExperience, type EventRecord } from '@/lib/api/events'
+import { brochureOf, coverIn, eventToExperience, type EventRecord } from '@/lib/api/events'
 import { liveListing, siteSlugOf, type ApiCourse } from '@/lib/api/courses'
 
 // Existing PADI courses and the freediving, mermaid and technical programmes share one /courses/[slug] route
@@ -15,7 +15,7 @@ export const revalidate = 300
 const apiCourse = async (slug: string) => {
   const listed = (await courseRecords()).find(x => siteSlugOf(x.slug) === slug)
   const record = listed && await getEventRecord('courses', listed.slug)
-  return record && eventToExperience(record)
+  return record && { ...eventToExperience(record), brochure: brochureOf(listed.slug) }
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -40,7 +40,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const events = await listEvents()
   const api = await apiCourse(slug)
   // The site keeps its structured copy; the title, price, duration, photo and policies are the API's
-  const fresh = api && { title: api.title, price: api.price?.replace(' per person', ''), duration: api.duration, image: api.image, imagePosition: undefined, policies: api.policies }
+  const fresh = api && { title: api.title, price: api.price?.replace(' per person', ''), duration: api.duration, image: api.image, imagePosition: undefined, policies: api.policies, brochure: api.brochure }
   const c = courses.find(x => x.slug === slug)
   if (c) {
     const next = courseNext[slug] ? listingOf(courseNext[slug]) : undefined

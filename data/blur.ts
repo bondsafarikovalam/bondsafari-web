@@ -2,6 +2,7 @@
 export const blurOf: Record<string, string> = {
   '/images/award-governor-kerala.webp': 'data:image/webp;base64,UklGRnoAAABXRUJQVlA4IG4AAAAQAgCdASoQAAsAAsBMJbACdAYt9u71OWhAAMyhu8p9Iqwq1dNGLUleSouMpEyKhS1TlQzny6IpjufS26KsWuJIWzBoT2vM4HkPmxxF9jinGvzrBtwEcjPy7y2UXIjBH+btl25OlWX79+eUusUAAA==',
   '/images/award-indian-army.webp': 'data:image/webp;base64,UklGRpAAAABXRUJQVlA4IIQAAABwAgCdASoQAAwAAsBMJbACdEf/i1uc76RtKUJAAP5J8aadq2Z3cN866at6vAX8MtdKVBDp/W8qKF5v5eicWdBYP4VbpI8kRr3Is/PASJtzvHrn9xSA0UdDbzvo5KmEnJAHmPr7uehuw/RuDVpUW7X3iJqYTqfEyjt8S0JQLo58yq4AAAA=',
+  '/images/award-jk-leadership.webp': 'data:image/webp;base64,UklGRnAAAABXRUJQVlA4IGQAAAAQAgCdASoQAAkAAsBMJbACdAEVOcjUHyNQAP7AUcgmSM0j1I9CphrDgIFrDavlXVnOTGlvCsCcK3BluySVMC9tsbErQ6jaf2lvO/ovAlA7hG9Ie/UbVSL73j4C99zUgFM1wAAA',
   '/images/award-sata-2023.webp': 'data:image/webp;base64,UklGRowAAABXRUJQVlA4IIAAAACwAgCdASoQAAsAAsBMJbACdDiAByY3mqinHJMxTYAA/t2e7lUlwNhiyNZyUuHTVmpkX88dpaq6Y9sxwhNApxfwClLa5Lj7RSDu30nlyEOI3tD1uv09xTfuJz0eMpmOIj4jvXsz3vmhRYfDD3dgxQ3+4cBGdVyeem7cr6fpoAAAAA==',
   '/images/blog-beyond-the-beach-5-ways-keralas-mission-samudra-is-redefining-the-blue-economy.webp': 'data:image/webp;base64,UklGRmYAAABXRUJQVlA4IFoAAAAQAgCdASoQAAkAAsBMJQBOgBu1Un1oJ2sAAP7x695dMKwItXIfYtpvLZi/NMLjpZhxNWkB0sc748HL3AdVf2tvXNqiJ204qHtp5aPrcZbvwQ1aCR/AHmYgAAA=',
   '/images/blog-bycatch-fishing-in-kerala.webp': 'data:image/webp;base64,UklGRl4AAABXRUJQVlA4IFIAAAAwAgCdASoQAAsAAsBMJYwAAujfdVds+jvYAAD++RbkRLv0MuQ+H87qe7wQx8wVqTfkL0+7REXksi48kSmjGbQGyPJ3g98DE0oWZPxJY5pRpAAA',

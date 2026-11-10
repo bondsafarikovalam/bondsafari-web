@@ -88,6 +88,8 @@ const eventSlugs: Record<string, string> = {
 const coverOf = (event?: EventRecord) => mediaUrl(event?.cover_pic || event?.list_pic)
 // The API's photo for a catalogue activity, when it has one
 export const apiSlugOf = (slug: string) => eventSlugs[slug] ?? slug
+// logout.world's brochure for an event: a ready PDF, downloaded as an attachment
+export const brochureOf = (eventSlug: string) => `https://logout.world/tours/${encodeURIComponent(eventSlug)}/pdf/?download=1`
 export const coverIn = (events: EventRecord[], slug: string) => coverOf(events.find(event => event.slug === apiSlugOf(slug)))
 
 export function eventToExperience(event: EventRecord, fallback?: Experience): Experience {
