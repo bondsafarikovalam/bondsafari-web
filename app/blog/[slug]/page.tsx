@@ -7,13 +7,13 @@ import { Header } from '@/components/layout/header'
 import { PostCard } from '@/components/pages/blog'
 import { ArticleBody, headingId } from '@/components/pages/article-body'
 import { contact } from '@/data/site'
-import { JsonLd, abs, breadcrumbLd } from '@/lib/seo'
+import { JsonLd, abs, breadcrumbLd, pageMeta } from '@/lib/seo'
 
 export const generateStaticParams = () => posts.map(p => ({ slug: p.slug }))
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const p = postOf((await params).slug)
-  return { title: p ? `${p.title} | Bond Safari` : 'Blog | Bond Safari', description: p?.excerpt, alternates: { canonical: `/blog/${p?.slug ?? ''}` }, openGraph: p && { type: 'article', images: [p.image] } }
+  return p ? pageMeta({ title: `${p.title} | Bond Safari`, description: p.excerpt, path: `/blog/${p.slug}`, image: p.image, type: 'article' }) : { title: 'Blog | Bond Safari' }
 }
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {

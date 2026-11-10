@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { landingPages } from '@/data/landing'
 import { LandingPage } from '@/components/pages/landing'
-import { JsonLd, breadcrumbLd } from '@/lib/seo'
+import { JsonLd, breadcrumbLd, pageMeta } from '@/lib/seo'
 
 // Search landing pages (/scuba-diving-in-kerala, /things-to-do-in-kovalam, …). Only the slugs listed in
 // data/landing.ts exist; anything else at this level is a 404.
@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ landing: 
   const { landing } = await params
   const page = landingPages.find(l => l.slug === landing)
   if (!page) return {}
-  return { title: page.title, description: page.description, alternates: { canonical: `/${page.slug}` }, openGraph: { title: page.title, description: page.description, images: [page.image], url: `/${page.slug}` } }
+  return pageMeta({ title: page.title, description: page.description, path: `/${page.slug}`, image: page.image })
 }
 
 export default async function Page({ params }: { params: Promise<{ landing: string }> }) {

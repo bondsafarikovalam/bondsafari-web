@@ -13,6 +13,9 @@ import { MuzirisSection } from '@/components/sections/muziris'
 import { listActivities, listEvents } from '@/lib/api/events-server'
 import { coverIn } from '@/lib/api/events'
 import { experiences } from '@/data/experiences'
+import { pageMeta } from '@/lib/seo'
+
+export const metadata = pageMeta({ title: 'Bond Safari | Scuba Diving & Water Sports in Kovalam', description: 'Scuba diving, snorkelling, kayaking, surfing and PADI diving courses in Kovalam, Kerala. Guided ocean adventures with all gear included — book online.', path: '/' })
 
 export const revalidate = 300
 

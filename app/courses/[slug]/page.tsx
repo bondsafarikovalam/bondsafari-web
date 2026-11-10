@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import { courses } from '@/data/courses'
 import { courseNext, homeCategoryOf, levelOf, listingOf, programmeOf, programmes, sectionOf, statusLabel, statusOf, typeOfKind, zeroToHeroStages } from '@/data/programmes'
 import { Detail, type RelatedItem } from '@/components/pages/detail'
-import { JsonLd, breadcrumbLd, faqLd } from '@/lib/seo'
+import { JsonLd, breadcrumbLd, faqLd, offeringLd, pageMeta } from '@/lib/seo'
 import { courseRecords, getEventRecord, listCourses, listEvents } from '@/lib/api/events-server'
 import { brochureOf, coverIn, eventToExperience, type EventRecord } from '@/lib/api/events'
 import { liveListing, siteSlugOf, type ApiCourse } from '@/lib/api/courses'
@@ -22,7 +22,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const api = await apiCourse(slug)
   const c = courses.find(x => x.slug === slug) ?? programmeOf(slug)
-  return { title: api || c ? `${api?.title ?? c?.title} | Bond Safari` : 'Course | Bond Safari', description: c?.description ?? api?.description, alternates: { canonical: `/courses/${slug}` } }
+  const title = api?.title ?? c?.title
+  if (!title) return { title: 'Course | Bond Safari' }
+  return pageMeta({ title: `${title} in Kovalam | Bond Academy`, description: c?.description ?? api?.description, path: `/courses/${slug}`, image: api?.image ?? c?.image })
 }
 
 // The rest of the course's own category first (next level leading), then the remaining categories' courses
@@ -35,7 +37,8 @@ function relatedFor(slug: string, live: ApiCourse[], events: EventRecord[], next
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const section = sectionOf(slug)
-  const crumbs = breadcrumbLd([['Home', '/'], [section.label, section.href]])
+  const crumbsTo = (title: string) => breadcrumbLd([['Home', '/'], [section.label, section.href], [title, `/courses/${slug}`]])
+  const course = (item: { title: string; description?: string; image?: string; price?: string }) => offeringLd({ kind: 'course', name: item.title, description: item.description, image: item.image, path: `/courses/${slug}`, price: item.price, seller: 'Bond Academy' })
   const live = await listCourses()
   const events = await listEvents()
   const api = await apiCourse(slug)
@@ -47,16 +50,20 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     const requirements = [...(c.minAge ? [['Minimum age', c.minAge] as [string, string]] : []), ['Prerequisite', c.prerequisite] as [string, string]]
     // Zero to Hero is a programme of five stages: list them on its own page as well as on the Scuba page
     const training = slug === 'zero-to-hero' ? zeroToHeroStages.map(s => ({ title: listingOf(s.slug)!.title, text: s.text })) : undefined
-    return <><JsonLd data={crumbs} /><Detail item={{ ...c, type: 'Course', status: statusOf(slug), level: levelOf(slug), category: c.level, eyebrow: c.minAge ? `Min. age ${c.minAge}` : c.eyebrow, location: 'Kovalam', requirements, training, next: next && { title: next.title, href: next.href }, section, ...fresh }} related={relatedFor(slug, live, events, courseNext[slug])} /></>
+    const shown = { ...c, ...fresh }
+    return <><JsonLd data={[crumbsTo(shown.title), course(shown)]} /><Detail item={{ ...c, type: 'Course', status: statusOf(slug), level: levelOf(slug), category: c.level, eyebrow: c.minAge ? `Min. age ${c.minAge}` : c.eyebrow, location: 'Kovalam', requirements, training, next: next && { title: next.title, href: next.href }, section, ...fresh }} related={relatedFor(slug, live, events, courseNext[slug])} /></>
   }
   const p = programmeOf(slug)
   if (!p) {
     if (!api) notFound()
-    return <><JsonLd data={crumbs} /><Detail item={{ ...api, type: 'Course', status: 'bookable', level: api.difficulty, category: 'Certification', section }} related={relatedFor(slug, live, events)} /></>
+    return <><JsonLd data={[crumbsTo(api.title), course(api)]} /><Detail item={{ ...api, type: 'Course', status: 'bookable', level: api.difficulty, category: 'Certification', section }} related={relatedFor(slug, live, events)} /></>
   }
   const next = p.next ? listingOf(p.next) : undefined
+  const shown = { ...p, ...fresh }
+  // A programme that isn't open yet has no price to offer
+  const ld = [crumbsTo(shown.title), ...(p.status === 'bookable' || fresh ? [course(shown)] : []), ...(p.faqs?.length ? [faqLd(p.faqs)] : [])]
   return <>
-    <JsonLd data={p.faqs?.length ? [crumbs, faqLd(p.faqs)] : crumbs} />
+    <JsonLd data={ld} />
     <Detail item={{ ...p, type: typeOfKind(p.kind), level: levelOf(slug), category: p.kind, duration: p.duration ?? 'Schedule varies', eyebrow: statusLabel[p.status], next: next && { title: next.title, href: next.href }, section, ...fresh }} related={relatedFor(slug, live, events, p.next)} />
   </>
 }

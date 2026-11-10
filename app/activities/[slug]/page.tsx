@@ -2,17 +2,28 @@ import { notFound } from 'next/navigation'
 import { experiences } from '@/data/experiences'
 import { courseNext, homeCategoryOf, levelOf, listingOf, sectionOf, statusOf } from '@/data/programmes'
 import { Detail, type RelatedItem } from '@/components/pages/detail'
-import { JsonLd, breadcrumbLd } from '@/lib/seo'
+import { JsonLd, breadcrumbLd, offeringLd, pageMeta } from '@/lib/seo'
 import { getEvent, getEventRecord, listActivities, listEvents } from '@/lib/api/events-server'
 import { apiSlugOf, brochureOf, coverIn } from '@/lib/api/events'
 
 export const dynamic = 'force-dynamic'
 export const generateStaticParams = () => experiences.map(e => ({ slug: e.slug }))
 
+// An activity the API lists but hasn't published (or has dropped) still opens from old links, but stays out of search.
+// When the API can't be reached nothing is hidden
+const isUnpublished = async (slug: string) => {
+  const events = await listEvents()
+  if (!events.length) return false
+  const record = events.find(x => x.slug === apiSlugOf(slug))
+  return !record || record.publish === false
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const e = (await getEvent(slug)) ?? experiences.find(x => x.slug === slug)
-  return { title: e ? `${e.title} | Bond Safari` : 'Activity | Bond Safari', description: e?.description, alternates: { canonical: `/activities/${slug}` } }
+  if (!e) return { title: 'Activity | Bond Safari' }
+  const cover = coverIn(await listEvents(), slug) ?? e.image
+  return pageMeta({ title: `${e.title} in Kovalam | Bond Safari`, description: e.tagline && !e.description.startsWith(e.tagline) ? `${e.tagline} — ${e.description}` : e.description, path: `/activities/${slug}`, image: cover, noindex: await isUnpublished(slug) })
 }
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
@@ -36,7 +47,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const record = await getEventRecord('activities', apiSlugOf(slug))
   const brochure = record && record.publish !== false ? brochureOf(record.slug) : undefined
   return <>
-    <JsonLd data={breadcrumbLd([['Home', '/'], [section.label, section.href]])} />
+    <JsonLd data={[breadcrumbLd([['Home', '/'], [section.label, section.href], [e.title, `/activities/${slug}`]]), offeringLd({ kind: 'activity', name: e.title, description: e.description, image: cover ?? e.image, path: `/activities/${slug}`, price: e.price, seller: 'Bond Safari Kovalam' })]} />
     <Detail item={{ ...e, ...(cover && { image: cover, imagePosition: undefined }), type: 'Activity', status: statusOf(slug), level: levelOf(slug) ?? e.difficulty, location: listing.location, next: next && { title: next.title, href: next.href }, section, brochure }} related={related} />
   </>
 }

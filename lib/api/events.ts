@@ -128,12 +128,25 @@ export function eventToExperience(event: EventRecord, fallback?: Experience): Ex
 
 // A catalogue activity with its API event's price, duration, photo and policies; its URL, name, tagline and location stay the site's
 export const catalogueEvent = (e: Experience, event: EventRecord): Experience => ({ ...eventToExperience(event, e), slug: e.slug, title: e.title, tagline: e.tagline, location: e.location })
-// What the site lists: the catalogue's activities, in its order, that have a published API event. Without the API the whole catalogue stands in
+// The Activities page's filter group for an event the catalogue doesn't have, read from its name
+const categoryOfName = (name: string) =>
+  /combo|package|\+|&|\band\b|\d\s*-?\s*in\s*-?\s*1/i.test(name) ? 'Combo'
+  : /scuba|dive|diving/i.test(name) ? 'Scuba diving'
+  : /snorkel/i.test(name) ? 'Snorkeling'
+  : /kayak/i.test(name) ? 'Kayaking'
+  : /parasail/i.test(name) ? 'Parasailing'
+  : 'Boating'
+
+// What the site lists: the catalogue's activities, in its order, that have a published API event, then every other published event
+// the API has, so a new activity shows as soon as the team publishes it. Without the API the whole catalogue stands in
 export const activitiesFrom = (events: EventRecord[]) => {
   const published = events.filter(x => x.publish !== false)
   if (!published.length) return experiences
-  return experiences.flatMap(e => {
+  const fromCatalogue = experiences.flatMap(e => {
     const event = published.find(x => x.slug === apiSlugOf(e.slug))
     return event ? [catalogueEvent(e, event)] : []
   })
+  const taken = new Set([...experiences.map(e => e.slug), ...experiences.map(e => apiSlugOf(e.slug))])
+  const extra = published.filter(x => !taken.has(x.slug)).map(x => ({ ...eventToExperience(x), category: categoryOfName(x.name) }))
+  return [...fromCatalogue, ...extra]
 }

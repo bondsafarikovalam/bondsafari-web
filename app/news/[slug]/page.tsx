@@ -7,13 +7,13 @@ import { Header } from '@/components/layout/header'
 import { StoryCardView } from '@/components/pages/blog'
 import { ArticleBody, headingId } from '@/components/pages/article-body'
 import { contact } from '@/data/site'
-import { JsonLd, abs, breadcrumbLd } from '@/lib/seo'
+import { JsonLd, abs, breadcrumbLd, pageMeta } from '@/lib/seo'
 
 export const generateStaticParams = () => stories.map(s => ({ slug: s.slug }))
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const s = storyOf((await params).slug)
-  return { title: s ? `${s.title} – ${s.outlet} | Bond Safari` : 'News | Bond Safari', description: s?.excerpt, alternates: { canonical: `/news/${s?.slug ?? ''}` }, openGraph: s && { type: 'article', images: [s.image] } }
+  return s ? pageMeta({ title: `${s.title} – ${s.outlet} | Bond Safari`, description: s.excerpt, path: `/news/${s.slug}`, image: s.image, type: 'article' }) : { title: 'News | Bond Safari' }
 }
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
