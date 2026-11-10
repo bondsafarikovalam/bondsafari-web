@@ -14,7 +14,8 @@ const save = (href: string, name: string) => {
 }
 
 // The brochure opens a short form; a name and number are asked for first, then the PDF downloads.
-// A PDF named in the catalogue (public/brochures) is used when there is one, otherwise one is made from the page
+// The event's logout.world brochure is used when there is one (it arrives as an attachment, so the page stays put),
+// otherwise a PDF is made from the page
 export function Brochure({ item }: { item: DetailItem }) {
   const dialog = useRef<HTMLDialogElement>(null)
   const [busy, setBusy] = useState(false)

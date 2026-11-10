@@ -54,8 +54,8 @@ const awards = [
   { title: 'Governor’s Special Award', by: 'Governor of Kerala', text: 'Honoured by the Governor of Kerala for exceptional support to the Indian Army across a range of initiatives.', image: '/images/award-governor-kerala.webp', alt: 'The Governor of Kerala presenting the Governor’s Special Award to the Bond Safari team' },
   { title: 'Indian Army Civilian Coordination Award', by: 'Indian Army', text: 'For a world-record underwater portrait of Kargil War hero Captain Vikram Batra.', image: '/images/award-indian-army.webp', alt: 'An Indian Army officer presenting medals to Bond Safari divers beside a pool' },
   { title: 'SATA Award 2023', by: 'South Asian Travel Awards', text: 'Best Water Sports Activity Service Provider in South India.', image: '/images/award-sata-2023.webp', alt: 'Bond Safari receiving the SATA 2023 winner’s plaque on stage' },
+  { title: 'National Adventure Tourism Leadership Award', by: 'Chief Minister of Jammu & Kashmir', text: 'Presented by the Chief Minister of Jammu & Kashmir.', image: '/images/award-jk-leadership.webp', alt: 'The Chief Minister of Jammu & Kashmir presenting the Excellence Award 2026 plaque to the Bond Safari founder on stage' },
 ]
-const alsoAward = { title: 'National Adventure Tourism Leadership Award', by: 'Presented by the Chief Minister of Jammu & Kashmir' }
 
 const network = [
   { name: 'Cristina Zenato, “The Shark Whisperer”', text: 'Bahamas-based shark conservationist and cave diver with 25+ years removing fishing hooks from Caribbean reef sharks.', image: '/images/network-cristina-zenato-hd.webp', alt: 'Cristina Zenato with the Bond team at ADEX' },
@@ -276,15 +276,11 @@ export function About() {
       <m.div className="ab-award-grid" initial="hidden" whileInView="show" viewport={{ once: true, margin: '-60px' }}>
         {awards.map((a, i) => <m.article key={a.title} className="ab-award" variants={reduce ? fade : awardCard} custom={i}>
           <m.div className="ab-award-photo" variants={reduce ? fade : awardPhoto} custom={i}>
-            <m.div className="ab-award-media" variants={reduce ? fade : awardZoom} custom={i}><Image src={a.image} alt={a.alt} fill sizes="(max-width: 800px) 100vw, 33vw" /></m.div>
+            <m.div className="ab-award-media" variants={reduce ? fade : awardZoom} custom={i}><Image src={a.image} alt={a.alt} fill sizes="(max-width: 800px) 100vw, 50vw" /></m.div>
             <span className="ab-award-by"><Award />{a.by}</span>
           </m.div>
           <div className="ab-award-body"><h3>{a.title}</h3><p>{a.text}</p></div>
         </m.article>)}
-      </m.div>
-      <m.div className="ab-award-also" initial="hidden" whileInView="show" viewport={{ once: true }} variants={reduce ? fade : rise}>
-        <span className="ab-store-icon"><Award /></span>
-        <div><h3>{alsoAward.title}</h3><p>{alsoAward.by}</p></div>
       </m.div>
     </section>
 

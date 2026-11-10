@@ -3,8 +3,8 @@ import { experiences } from '@/data/experiences'
 import { courseNext, homeCategoryOf, levelOf, listingOf, sectionOf, statusOf } from '@/data/programmes'
 import { Detail, type RelatedItem } from '@/components/pages/detail'
 import { JsonLd, breadcrumbLd } from '@/lib/seo'
-import { getEvent, listActivities, listEvents } from '@/lib/api/events-server'
-import { coverIn } from '@/lib/api/events'
+import { getEvent, getEventRecord, listActivities, listEvents } from '@/lib/api/events-server'
+import { apiSlugOf, brochureOf, coverIn } from '@/lib/api/events'
 
 export const dynamic = 'force-dynamic'
 export const generateStaticParams = () => experiences.map(e => ({ slug: e.slug }))
@@ -32,8 +32,11 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const related = fromApi.length ? fromApi : fromCatalogue
   const listing = listingOf(slug) ?? { location: e.location ?? 'Kovalam', level: e.category }
   const next = courseNext[slug] ? listingOf(courseNext[slug]) : undefined
+  // The published event's brochure from logout.world; without one the page makes its own PDF
+  const record = await getEventRecord('activities', apiSlugOf(slug))
+  const brochure = record && record.publish !== false ? brochureOf(record.slug) : undefined
   return <>
     <JsonLd data={breadcrumbLd([['Home', '/'], [section.label, section.href]])} />
-    <Detail item={{ ...e, ...(cover && { image: cover, imagePosition: undefined }), type: 'Activity', status: statusOf(slug), level: levelOf(slug) ?? e.difficulty, location: listing.location, next: next && { title: next.title, href: next.href }, section }} related={related} />
+    <Detail item={{ ...e, ...(cover && { image: cover, imagePosition: undefined }), type: 'Activity', status: statusOf(slug), level: levelOf(slug) ?? e.difficulty, location: listing.location, next: next && { title: next.title, href: next.href }, section, brochure }} related={related} />
   </>
 }

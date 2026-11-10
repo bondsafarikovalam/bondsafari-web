@@ -11,7 +11,14 @@ import { blurOf } from '@/data/blur'
 export default function Image({ style, className, onLoad, ...props }: ImageProps) {
   const [loaded, setLoaded] = useState(false)
   const blur = typeof props.src === 'string' ? blurOf[props.src] : undefined
-  if (blur) return <NextImage style={{ backgroundImage: `url(${blur})`, backgroundSize: 'cover', backgroundPosition: style?.objectPosition ?? 'center', ...style }} className={className} onLoad={onLoad} {...props} />
+  // The preview is dropped once the photo has loaded, so it never shows around a logo or any object-fit:contain image
+  if (blur) return <NextImage
+    style={loaded ? style : { backgroundImage: `url(${blur})`, backgroundSize: 'cover', backgroundPosition: style?.objectPosition ?? 'center', ...style }}
+    className={className}
+    onLoad={e => { setLoaded(true); onLoad?.(e) }}
+    onError={() => setLoaded(true)}
+    {...props}
+  />
   return (
     <NextImage
       style={style}
