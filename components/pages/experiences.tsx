@@ -10,7 +10,8 @@ import { contact } from '@/data/site'
 import { Header } from '@/components/layout/header'
 import { LayoutMotion } from '@/components/layout/motion-provider'
 import { TypeKey } from '@/components/pages/programmes'
-import { Cta, ctaOf } from '@/components/pages/detail'
+import { Cta } from '@/components/booking/book'
+import { ctaOf, eventSlugOf } from '@/lib/booking/cta'
 import { statusOf } from '@/data/programmes'
 import { Mask as CssMask, enter } from '@/components/layout/intro'
 import { useEventsStore } from '@/lib/stores/events'
@@ -31,7 +32,7 @@ const rank = (e: Experience) => leaders.includes(e.slug) ? leaders.indexOf(e.slu
 const Mask = (props: { children: React.ReactNode; delay?: number }) => <CssMask from="105%" duration={1.6} {...props} />
 
 function Card({ e, index, featured }: { e: Experience; index: number; featured: boolean }) {
-  const cta = ctaOf(e.title, statusOf(e.slug))
+  const cta = ctaOf(e.title, eventSlugOf(e.slug), statusOf(e.slug))
   return <m.article layout className={`xp-card${featured ? ' is-featured' : ''}`} initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96 }} transition={{ duration: 0.8, ease, delay: Math.min(index, 6) * 0.06 }}>
     <Link className="xp-card-media" href={`/activities/${e.slug}`} aria-label={`${e.title} — view details`}>
       <Image src={e.image} alt="" fill sizes={featured ? '(max-width: 800px) 100vw, 66vw' : '(max-width: 800px) 100vw, 33vw'} style={{ objectPosition: e.imagePosition }} />
@@ -92,7 +93,7 @@ export function Experiences({ initial = [] }: { initial?: Experience[] }) {
         <h1><Mask delay={0.3}>Choose your</Mask><br /><Mask delay={0.45}><i>adventure.</i></Mask></h1>
         <p className={`xp-hero-sub ${enter({ y: 16, duration: 1.2 }).className}`} style={enter({ y: 16, duration: 1.2 }).style}>Underwater scooters, guided dives, snorkelling, kayaking and coracle rides — for every age and ability, with all equipment included.</p>
         <div className={`xp-hero-actions ${enter({ y: 16, duration: 1.2, delay: 0.85 }).className}`} style={enter({ y: 16, duration: 1.2, delay: 0.85 }).style}>
-          <Link className="book-cta" href="/booking"><span className="book-cta-label"><strong>Book an adventure</strong><small>From ₹{fromPrice} per person</small></span><span className="book-cta-icon"><ArrowRight /></span></Link>
+          <Link className="book-cta" href="#all-activities"><span className="book-cta-label"><strong>Book an adventure</strong><small>From ₹{fromPrice} per person</small></span><span className="book-cta-icon"><ArrowRight /></span></Link>
           <a className="text-link light" href="#all-activities">Browse all {activities.length} <ArrowRight /></a>
         </div>
       </m.div>
@@ -141,7 +142,7 @@ export function Experiences({ initial = [] }: { initial?: Experience[] }) {
           <m.p className="eyebrow light" variants={rise}>02 — Booking made simple</m.p>
           <m.h2 variants={rise} custom={1}>Your day at sea,<br /><i>reserved in a minute.</i></m.h2>
           <m.div className="xp-book-actions" variants={rise} custom={2}>
-            <Link className="book-cta" href="/booking"><span className="book-cta-label"><strong>Book now</strong><small>Reserve your spot</small></span><span className="book-cta-icon"><ArrowRight /></span></Link>
+            <Link className="book-cta" href="#all-activities"><span className="book-cta-label"><strong>Book now</strong><small>Reserve your spot</small></span><span className="book-cta-icon"><ArrowRight /></span></Link>
             <a className="xp-book-call" href={`tel:${tel}`}><Phone /><span><small>Prefer to talk?</small>{contact.phones[0]}</span></a>
           </m.div>
         </m.div>
@@ -159,6 +160,6 @@ export function Experiences({ initial = [] }: { initial?: Experience[] }) {
       </div>
     </section>
 
-    <div className={`dt-mobile-bar xp-bar${barShown ? ' is-shown' : ''}`} inert={!barShown}><div><b>{experiences.length} activities</b><span>From ₹{fromPrice} per person</span></div><Link className="book-cta book-cta-sm" href="/booking"><span className="book-cta-label"><strong>Book</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link></div>
+    <div className={`dt-mobile-bar xp-bar${barShown ? ' is-shown' : ''}`} inert={!barShown}><div><b>{experiences.length} activities</b><span>From ₹{fromPrice} per person</span></div><Link className="book-cta book-cta-sm" href="#all-activities"><span className="book-cta-label"><strong>Book</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link></div>
   </main>
 }

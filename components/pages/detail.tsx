@@ -6,33 +6,27 @@ import { useRouter } from 'next/navigation'
 import { m, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { AlertCircle, ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Check, Clock, MapPin, Phone, ShieldCheck } from 'lucide-react'
 import { useRef } from 'react'
-import { contact, whatsappLink } from '@/data/site'
-import { enquiryMessage, statusLabel, type Fact, type Faq, type ItemType, type Kind, type Status, type Step } from '@/data/programmes'
+import { contact } from '@/data/site'
+import { statusLabel, type Fact, type Faq, type ItemType, type Kind, type Status, type Step } from '@/data/programmes'
 import { Brochure } from '@/components/pages/brochure'
+import { Cta } from '@/components/booking/book'
+import { ctaOf, eventOfHref } from '@/lib/booking/cta'
 import { Header } from '@/components/layout/header'
 import { Mask as CssMask, enter } from '@/components/layout/intro'
 
 const ease = [0.19, 1, 0.22, 1] as const
 const rise = { hidden: { opacity: 0, y: 36 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1, ease, delay: i * 0.08 } }) }
 
-export type DetailItem = { title: string; category: string; duration: string; price?: string; image: string; imagePosition?: string; eyebrow?: string; description?: string; tagline?: string; overview?: string[]; details?: string[]; brochure?: string; section: { label: string; href: string }
+export type DetailItem = { title: string; event?: string; category: string; duration: string; price?: string; image: string; imagePosition?: string; eyebrow?: string; description?: string; tagline?: string; overview?: string[]; details?: string[]; brochure?: string; section: { label: string; href: string }
   // Course information: each section shows only when the course has it
   type?: ItemType; kind?: Kind; level?: string; status?: Status; location?: string; requirements?: Fact[]; performance?: Fact[]; learn?: string[]; training?: Step[]; safety?: string[]; certification?: string; next?: { title: string; href: string }; faqs?: Faq[]; verify?: string
   // Activity information from the events API
   meetingPoint?: string; mapLink?: string; ageLimit?: string; highlights?: { title?: string; text: string }[]; notes?: { title: string; items: string[] }[]; policies?: { title: string; items: string[] }[] }
 export type RelatedItem = { title: string; category: string; image: string; href: string; imagePosition?: string; price?: string; duration?: string; tagline?: string; status?: Status }
 
-// Bookable items go to the booking flow; anything else opens a WhatsApp message, labelled for what happens next
-const ctaLabel: Partial<Record<Status, string>> = { apply: 'Apply now', 'coming-soon': 'Register interest' }
-export const ctaOf = (title: string, status: Status = 'bookable') => status === 'bookable'
-  ? { href: `/booking?activity=${encodeURIComponent(title)}`, label: 'Book now', external: false }
-  : { href: whatsappLink(enquiryMessage(title)), label: ctaLabel[status] ?? 'Enquire now', external: true }
-export function Cta({ cta, className, label, children }: { cta: ReturnType<typeof ctaOf>; className: string; label?: string; children: React.ReactNode }) {
-  return cta.external ? <a className={className} href={cta.href} target="_blank" rel="noopener noreferrer" aria-label={label}>{children}</a> : <Link className={className} href={cta.href} aria-label={label}>{children}</Link>
-}
 // How to get a place, in one sentence, for the Location & availability section
 const availability: Record<Status, string> = {
-  bookable: 'Choose a date and your group online, and we confirm your slot on WhatsApp before you pay.',
+  bookable: 'Tap Book now to choose your date and pay securely online.',
   enquire: 'Dates are arranged on request. Message us and we’ll tell you the next dates and the price.',
   apply: 'Places follow a short eligibility check. Apply on WhatsApp and the Academy team will take you through the next steps and dates.',
   paused: 'This activity is paused for now. Message us to hear when it’s running again.',
@@ -62,7 +56,7 @@ export function Detail({ item, related }: { item: DetailItem; related: RelatedIt
   const fade = useTransform(scrollYProgress, [0, 0.6], [1, 0])
   const overview = item.overview?.length ? item.overview : item.description ? [item.description] : []
   const details = item.details ?? []
-  const cta = ctaOf(item.title, item.status)
+  const cta = ctaOf(item.title, item.event, item.status)
   const asked = item.status && item.status !== 'bookable'
   const facts = [['Duration', item.duration], ['Type', item.type ? (item.type === 'Activity' ? 'Activity' : `${item.type} · certification`) : item.category], ['Price', item.price ?? 'Contact for price'], item.location ? ['Location', item.location] : ['Good to know', item.eyebrow ?? 'All ages welcome']]
   // At a glance: only what the item records; location, price and duration already lead the page in the hero
@@ -185,7 +179,7 @@ export function Detail({ item, related }: { item: DetailItem; related: RelatedIt
           <div className="dt-related-img"><Image src={r.image} alt={r.title} fill sizes="(max-width: 800px) 80vw, 26vw" style={{ objectPosition: r.imagePosition }} />{r.price && <span className="dt-related-price">{r.price.replace(' per person', '')}</span>}</div>
           <div className="dt-related-info"><span>{r.category}{r.duration && ` · ${r.duration}`}</span><h3>{r.title}</h3>{r.tagline && <p>{r.tagline}</p>}<i><ArrowUpRight /></i></div>
         </Link>
-        {(() => { const c = ctaOf(r.title, r.status); return <Cta cta={c} className="dt-related-book">{c.external ? c.label : `Book ${r.title}`} <ArrowRight /></Cta> })()}
+        {(() => { const c = ctaOf(r.title, eventOfHref(r.href), r.status); return <Cta cta={c} className="dt-related-book">{c.external ? c.label : `Book ${r.title}`} <ArrowRight /></Cta> })()}
       </m.div>)}</div>
     </section>}
 

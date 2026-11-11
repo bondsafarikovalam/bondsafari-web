@@ -15,7 +15,7 @@ export const revalidate = 300
 const apiCourse = async (slug: string) => {
   const listed = (await courseRecords()).find(x => siteSlugOf(x.slug) === slug)
   const record = listed && await getEventRecord('courses', listed.slug)
-  return record && { ...eventToExperience(record), brochure: brochureOf(listed.slug) }
+  return record && { ...eventToExperience(record), brochure: brochureOf(listed.slug), event: listed.slug }
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -43,7 +43,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const events = await listEvents()
   const api = await apiCourse(slug)
   // The site keeps its structured copy; the title, price, duration, photo and policies are the API's
-  const fresh = api && { title: api.title, price: api.price?.replace(' per person', ''), duration: api.duration, image: api.image, imagePosition: undefined, policies: api.policies, brochure: api.brochure }
+  const fresh = api && { title: api.title, price: api.price?.replace(' per person', ''), duration: api.duration, image: api.image, imagePosition: undefined, policies: api.policies, brochure: api.brochure, event: api.event }
   const c = courses.find(x => x.slug === slug)
   if (c) {
     const next = courseNext[slug] ? listingOf(courseNext[slug]) : undefined

@@ -57,7 +57,7 @@ export function TeamSection() {
         <m.p className="team-lead" variants={rise} custom={1}>A team of adventurous, experienced Indian entrepreneurs, partnered with <em>Cool Divers SL</em> from Spain to bring a state-of-the-art diving experience to Kerala.</m.p>
         <m.p className="team-goal" variants={rise} custom={2}><b>Our goal</b> — to develop state-of-the-art adventure tourism products in India.</m.p>
         <m.div className="team-actions" variants={rise} custom={3}>
-          <Link className="book-cta" href="/booking"><span className="book-cta-label"><strong>Dive with us</strong><small>Reserve your spot</small></span><span className="book-cta-icon"><ArrowRight /></span></Link>
+          <Link className="book-cta" href="/activities/scuba-diving"><span className="book-cta-label"><strong>Dive with us</strong><small>Reserve your spot</small></span><span className="book-cta-icon"><ArrowRight /></span></Link>
           <Link className="text-link" href="/about">Our story <ArrowRight /></Link>
         </m.div>
       </m.div>

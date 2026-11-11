@@ -15,6 +15,8 @@ const siteSlugs: Record<string, string> = {
   'padi-advanced-mermaid-course': 'advanced-mermaid',
 }
 export const siteSlugOf = (slug: string) => siteSlugs[slug] ?? slug
+// The other way round: a course page's event on logout.world
+export const courseEventSlugOf = (slug: string) => Object.keys(siteSlugs).find(k => siteSlugs[k] === slug) ?? slug
 
 export type ApiCourse = { slug: string; eventSlug: string; section: string; title: string; image: string; price?: string; duration: string; summary: string }
 
