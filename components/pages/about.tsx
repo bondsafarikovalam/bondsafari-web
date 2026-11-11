@@ -360,7 +360,7 @@ export function About() {
         <m.p className="eyebrow light" variants={rise}>Your next story</m.p>
         <m.h2 variants={rise} custom={1}>Start your underwater<br /><i>adventure now.</i></m.h2>
         <m.div className="ab-cta-actions" variants={rise} custom={2}>
-          <Link className="book-cta" href="/booking"><span className="book-cta-label"><strong>Book now</strong><small>Reserve your spot</small></span><span className="book-cta-icon"><ArrowRight /></span></Link>
+          <Link className="book-cta" href="/activities"><span className="book-cta-label"><strong>Book now</strong><small>Reserve your spot</small></span><span className="book-cta-icon"><ArrowRight /></span></Link>
           <Link className="text-link light" href="/contact">Get in touch <ArrowRight /></Link>
         </m.div>
       </m.div>

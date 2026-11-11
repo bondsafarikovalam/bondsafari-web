@@ -27,7 +27,7 @@ const ours: Post[] = [
       { h: 'What it costs' },
       { p: 'A first dive in the sea is ₹4,500 per person, taxes included. If it hooks you, the PADI Open Water Diver course is the next step: four days, and a certification that lets you dive anywhere in the world.' },
     ],
-    cta: { label: 'Book your first dive', href: '/booking?activity=scuba-diving' },
+    cta: { label: 'Book your first dive', href: '/activities/scuba-diving' },
   },
   {
     slug: 'diving-in-the-monsoon', title: 'Diving in the monsoon: why we head to the quarry', topic: 'Seasons', date: '2026-10-20', readMins: 3,

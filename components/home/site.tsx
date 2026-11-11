@@ -83,6 +83,5 @@ export function HeroStatement() {
   </section>
 }
 
-export function BookingBar() { return <section className="booking-bar"><div><span>01</span><label>Choose your activity<select defaultValue=""><option value="" disabled>Select an activity</option>{experiences.map(e => <option key={e.slug}>{e.title}</option>)}</select></label></div><div><span>02</span><label>When are you joining us?<input type="date" /></label></div><div><span>03</span><label>Guests<select defaultValue="2"><option>1 guest</option><option>2 guests</option><option>3 guests</option><option>4 guests</option></select></label></div><Link className="bar-submit" href="/booking">Continue <ArrowRight /></Link></section> }
 
 export function ExperienceCard({ experience, index = 0 }: { experience: typeof experiences[number]; index?: number }) { return <Reveal className={`experience-card card-${index}`}><Link href={`/activities/${experience.slug}`}><div className="image-wrap"><Image src={experience.image} alt={experience.title} fill sizes="(max-width: 768px) 100vw, 50vw" /></div><div className="card-meta"><span>{experience.category}</span><span>{experience.duration}</span></div><h3>{experience.title}</h3><p>{experience.description}</p><span className="text-link">Discover more <ArrowRight /></span></Link></Reveal> }

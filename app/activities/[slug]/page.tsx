@@ -46,8 +46,10 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   // The published event's brochure from logout.world; without one the page makes its own PDF
   const record = await getEventRecord('activities', apiSlugOf(slug))
   const brochure = record && record.publish !== false ? brochureOf(record.slug) : undefined
+  // Book now opens this event's logout.world widget; an unpublished event takes enquiries on WhatsApp instead
+  const event = record ? (record.publish !== false ? record.slug : undefined) : apiSlugOf(slug)
   return <>
     <JsonLd data={[breadcrumbLd([['Home', '/'], [section.label, section.href], [e.title, `/activities/${slug}`]]), offeringLd({ kind: 'activity', name: e.title, description: e.description, image: cover ?? e.image, path: `/activities/${slug}`, price: e.price, seller: 'Bond Safari Kovalam' })]} />
-    <Detail item={{ ...e, ...(cover && { image: cover, imagePosition: undefined }), type: 'Activity', status: statusOf(slug), level: levelOf(slug) ?? e.difficulty, location: listing.location, next: next && { title: next.title, href: next.href }, section, brochure }} related={related} />
+    <Detail item={{ ...e, ...(cover && { image: cover, imagePosition: undefined }), type: 'Activity', status: statusOf(slug), level: levelOf(slug) ?? e.difficulty, location: listing.location, next: next && { title: next.title, href: next.href }, section, brochure, event }} related={related} />
   </>
 }

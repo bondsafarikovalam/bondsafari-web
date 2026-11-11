@@ -61,7 +61,7 @@ export function productLd(p: Product) {
     url: abs(hrefOf(p)),
     brand: { '@type': 'Brand', name: p.seller },
     ...(p.kind === 'course' ? { provider: { '@type': 'Organization', name: p.seller, sameAs: siteUrl } } : {}),
-    ...(p.amount ? { offers: { '@type': 'Offer', price: p.amount, priceCurrency: 'INR', url: abs(`/booking?activity=${encodeURIComponent(p.title)}`), seller: { '@type': 'Organization', name: p.seller } } } : {}),
+    ...(p.amount ? { offers: { '@type': 'Offer', price: p.amount, priceCurrency: 'INR', url: abs(hrefOf(p)), seller: { '@type': 'Organization', name: p.seller } } } : {}),
   }
 }
 
@@ -90,7 +90,7 @@ export function offeringLd({ kind, name, description, image, path, price, seller
     url: abs(path),
     brand: { '@type': 'Brand', name: seller },
     ...(kind === 'course' ? { provider: { '@type': 'Organization', name: seller, sameAs: siteUrl } } : {}),
-    ...(amount ? { offers: { '@type': 'Offer', price: amount, priceCurrency: 'INR', availability: 'https://schema.org/InStock', url: abs(`/booking?activity=${encodeURIComponent(name)}`), seller: { '@type': 'Organization', name: seller } } } : {}),
+    ...(amount ? { offers: { '@type': 'Offer', price: amount, priceCurrency: 'INR', availability: 'https://schema.org/InStock', url: abs(path), seller: { '@type': 'Organization', name: seller } } } : {}),
   }
 }
 

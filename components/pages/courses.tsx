@@ -1,5 +1,7 @@
 'use client'
 
+import { Cta } from '@/components/booking/book'
+import { ctaOf, eventOfHref } from '@/lib/booking/cta'
 import Image from '@/components/ui/photo'
 import Link from 'next/link'
 import { m, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from 'framer-motion'
@@ -29,7 +31,6 @@ const sectionsFrom = (live: ApiCourse[]) => coursesPage.map(g => {
 const numOf = (i: number) => String(i + 1).padStart(2, '0')
 const rise = { hidden: { opacity: 0, y: 40 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1, ease, delay: i * 0.1 } }) }
 const tel = contact.phones[0].replace(/\s/g, '')
-const bookHref = (title: string) => `/booking?activity=${encodeURIComponent(title)}`
 const hero = courses.find(c => c.slug === 'zero-to-hero')!
 const freediverInstructor = programmeOf('freediver-instructor')!
 const mermaidInstructor = programmeOf('mermaid-instructor')!
@@ -114,7 +115,7 @@ export function Courses({ live = [] }: { live?: ApiCourse[] }) {
         <h1><Mask delay={0.3}>Learn to dive.</Mask><br /><Mask delay={0.45}><i>Then lead.</i></Mask></h1>
         <p className={`xp-hero-sub ${enter({ y: 16, duration: 1.2 }).className}`} style={enter({ y: 16, duration: 1.2 }).style}>Internationally recognised PADI courses in Kovalam — from your very first breath underwater to becoming an instructor.</p>
         <div className={`xp-hero-actions ${enter({ y: 16, duration: 1.2, delay: 0.85 }).className}`} style={enter({ y: 16, duration: 1.2, delay: 0.85 }).style}>
-          <Link className="book-cta" href={bookHref(start.title)}><span className="book-cta-label"><strong>Start with Open Water</strong><small>{start.duration} · {start.price}</small></span><span className="book-cta-icon"><ArrowRight /></span></Link>
+          <Cta cta={ctaOf(start.title, eventOfHref(`/courses/${start.slug}`))} className="book-cta"><span className="book-cta-label"><strong>Start with Open Water</strong><small>{start.duration} · {start.price}</small></span><span className="book-cta-icon"><ArrowRight /></span></Cta>
           <a className="text-link light" href="#pathway">See the pathway <ArrowRight /></a>
         </div>
       </m.div>
@@ -200,7 +201,7 @@ export function Courses({ live = [] }: { live?: ApiCourse[] }) {
           <m.p className="eyebrow light" variants={rise}>Not sure where to start?</m.p>
           <m.h2 variants={rise} custom={1}>Talk to our<br /><i>course advisor.</i></m.h2>
           <m.div className="xp-book-actions" variants={rise} custom={2}>
-            <Link className="book-cta" href="/booking"><span className="book-cta-label"><strong>Enrol now</strong><small>Secure your batch</small></span><span className="book-cta-icon"><ArrowRight /></span></Link>
+            <Link className="book-cta" href="#categories"><span className="book-cta-label"><strong>Enrol now</strong><small>Secure your batch</small></span><span className="book-cta-icon"><ArrowRight /></span></Link>
             <a className="xp-book-call" href={`tel:${tel}`}><Phone /><span><small>Call or WhatsApp</small>{contact.phones[0]}</span></a>
           </m.div>
         </m.div>
@@ -208,7 +209,7 @@ export function Courses({ live = [] }: { live?: ApiCourse[] }) {
           {[
             { icon: GraduationCap, title: 'Choose your course', text: 'Never dived? Start with Open Water. Already certified? Level up.' },
             { icon: ShieldCheck, title: 'Pay a booking amount', text: 'Reserve your batch with a part payment — the balance before you start.' },
-            { icon: Award, title: 'Train & get certified', text: 'Learn with PADI 5★ instructors and earn a certification recognised worldwide.' },
+            { icon: Award, title: 'Train & get certified', text: 'Learn with PADI 5★★★★★ Master Instructor, IDC Staff Instructors and Elite Instructors and earn a certification recognised worldwide.' },
           ].map((s, i) => <m.li key={s.title} initial="hidden" whileInView="show" viewport={{ once: true, margin: '-40px' }} variants={rise} custom={i}>
             <span className="xp-step-num">{String(i + 1).padStart(2, '0')}</span>
             <span className="xp-step-icon"><s.icon /></span>
@@ -218,6 +219,6 @@ export function Courses({ live = [] }: { live?: ApiCourse[] }) {
       </div>
     </section>
 
-    <div className={`dt-mobile-bar xp-bar${barShown ? ' is-shown' : ''}`} inert={!barShown}><div><b>{courseCount} courses</b><span>{sections.map(g => g.title.replace(/( Diving)? Courses$/, '')).join(' · ')}</span></div><Link className="book-cta book-cta-sm" href="/booking"><span className="book-cta-label"><strong>Enrol</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link></div>
+    <div className={`dt-mobile-bar xp-bar${barShown ? ' is-shown' : ''}`} inert={!barShown}><div><b>{courseCount} courses</b><span>{sections.map(g => g.title.replace(/( Diving)? Courses$/, '')).join(' · ')}</span></div><Link className="book-cta book-cta-sm" href="#categories"><span className="book-cta-label"><strong>Enrol</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link></div>
   </main>
 }

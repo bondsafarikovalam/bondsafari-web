@@ -49,7 +49,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         <div className="bl-aside-card is-dark">
           <p className="bl-aside-label">Ready to dive in?</p>
           <p className="bl-aside-title">Feel the marvels <i>hidden beneath.</i></p>
-          <Link className="book-cta" href={p.cta?.href ?? '/booking'}><span className="book-cta-label"><strong>{p.cta?.label ?? 'Book now'}</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link>
+          <Link className="book-cta" href={p.cta?.href ?? '/activities'}><span className="book-cta-label"><strong>{p.cta?.label ?? 'Book now'}</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link>
           <a className="bl-aside-call" href={`tel:${contact.phones[0].replace(/\s/g, '')}`}><Phone /> {contact.phones[0]}</a>
         </div>
       </aside>

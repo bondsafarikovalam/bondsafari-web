@@ -22,7 +22,7 @@ export function HomeBar() {
     <div><b>Book an adventure</b><span>From ₹{fromPrice} per person</span></div>
     <div className="home-bar-actions">
       <a className="home-bar-wa" href={whatsappLink('Hello Bond Safari! I’d like to book an adventure in Kovalam.')} target="_blank" rel="noreferrer" aria-label="Chat with us on WhatsApp"><WhatsAppIcon /></a>
-      <Link className="book-cta book-cta-sm" href="/booking"><span className="book-cta-label"><strong>Book</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link>
+      <Link className="book-cta book-cta-sm" href="/activities"><span className="book-cta-label"><strong>Book</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link>
     </div>
   </div>
 }

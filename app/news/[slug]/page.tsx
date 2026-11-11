@@ -42,7 +42,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         <p className="bl-source">As covered by {s.outlet}</p>
         <p className="bl-lead">{s.excerpt}</p>
         <ArticleBody body={s.body} />
-        <Link className="book-cta bl-cta" href="/booking?activity=scuba-diving"><span className="book-cta-label"><strong>Dive with Bond Safari</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link>
+        <Link className="book-cta bl-cta" href="/activities/scuba-diving"><span className="book-cta-label"><strong>Dive with Bond Safari</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link>
       </article>
       <aside className="bl-aside">
         <div className="bl-aside-card">
@@ -54,13 +54,13 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         {/* <div className="bl-aside-card is-dark">
           <p className="bl-aside-label">Be part of the story</p>
           <p className="bl-aside-title">Feel the marvels <i>hidden beneath.</i></p>
-          <Link className="book-cta" href="/booking?activity=scuba-diving"><span className="book-cta-label"><strong>Dive with us</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link>
+          <Link className="book-cta" href="/activities/scuba-diving"><span className="book-cta-label"><strong>Dive with us</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link>
           <a className="bl-aside-call" href={`tel:${contact.phones[0].replace(/\s/g, '')}`}><Phone /> {contact.phones[0]}</a>
         </div> */}
            <div className="bl-aside-card is-dark">
           <p className="bl-aside-label">Be part of the story</p>
           <p className="bl-aside-title">Feel the marvels <i>hidden beneath.</i></p>
-          <Link className="book-cta" href="/booking?activity=scuba-diving"><span className="book-cta-label"><strong>Dive with us</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link>
+          <Link className="book-cta" href="/activities/scuba-diving"><span className="book-cta-label"><strong>Dive with us</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link>
           <a className="bl-aside-call" href={`tel:${contact.phones[0].replace(/\s/g, '')}`}><Phone /> {contact.phones[0]}</a>
         </div>
       </aside>

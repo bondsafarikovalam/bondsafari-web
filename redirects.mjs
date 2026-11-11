@@ -20,6 +20,8 @@ export const legacyRedirects = [
   // The section was renamed from Experiences to Activities; keep old links and search results working
   { source: '/experiences', destination: '/activities', permanent: true },
   { source: '/experiences/:slug', destination: '/activities/:slug', permanent: true },
+  // Booking now happens in the logout.world widget on each activity and course, so the old booking page lists the activities
+  { source: '/booking', destination: '/activities', permanent: true },
 
   { source: '/index.html', destination: '/', permanent: true },
   { source: '/about-us.html', destination: '/about', permanent: true },

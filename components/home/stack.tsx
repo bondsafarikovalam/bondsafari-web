@@ -8,7 +8,8 @@ import { useEffect, useState } from 'react'
 import { activityGroups, experiences, groupOf, type Experience } from '@/data/experiences'
 import { listingOf, statusOf } from '@/data/programmes'
 import { timesFor } from '@/lib/booking/cart'
-import { Cta, ctaOf } from '@/components/pages/detail'
+import { Cta } from '@/components/booking/book'
+import { ctaOf, eventSlugOf } from '@/lib/booking/cta'
 import { LayoutMotion } from '@/components/layout/motion-provider'
 import { useEventsStore } from '@/lib/stores/events'
 
@@ -39,7 +40,7 @@ const nextDeparture = (slug: string, now: number) => {
 function Card({ e, i, now }: { e: Experience; i: number; now?: number }) {
   const reduce = useReducedMotion()
   const status = statusOf(e.slug)
-  const cta = ctaOf(e.title, status)
+  const cta = ctaOf(e.title, eventSlugOf(e.slug), status)
   const soon = now !== undefined && status === 'bookable' ? nextDeparture(e.slug, now) : undefined
   return <m.article layout={!reduce} className={`tg-card${status === 'paused' ? ' is-paused' : ''}`}
     initial={{ opacity: 0, y: reduce ? 0 : 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: reduce ? 1 : 0.96 }}
