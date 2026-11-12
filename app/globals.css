@@ -685,3 +685,13 @@ img.photo-loading{background-color:rgba(127,140,141,.18);background-image:linear
 @media(prefers-reduced-motion:reduce){.fq-a,.fq-icon::before,.fq-icon::after,.fq-tabs button{transition:none}}
 @media(max-width:800px){.fq-hero{padding:130px 16px 50px}.fq-body{padding:40px 16px 90px}.fq-tools{position:static}.fq-tabs{flex-wrap:nowrap;gap:6px}.fq-tabs button{flex:1;justify-content:center;padding:0 8px;font-size:13px}.fq-tabs button span{display:none}.fq-item button{padding:16px 18px;font-size:17px}.fq-a-body{padding:0 18px 18px}.fq-notes{padding:20px}}
 .fq .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* Activities page: every activity as the same self-contained card */
+.xp-grid-cards{gap:26px;align-items:stretch}
+.xp-grid-cards .xp-card{overflow:hidden;border-radius:24px;background:white;box-shadow:0 18px 40px -28px rgba(8,45,58,.45);transition:transform .5s cubic-bezier(.19,1,.22,1),box-shadow .5s}
+.xp-grid-cards .xp-card:hover{transform:translateY(-4px);box-shadow:0 26px 50px -28px rgba(8,45,58,.55)}
+.xp-grid-cards .xp-card-media{aspect-ratio:4/3;border-radius:0}
+.xp-grid-cards .xp-card-body{padding:22px 22px 24px}
+.xp-grid-cards .xp-card h3{font-size:26px}
+.xp-grid-cards .xp-card-tag{font-size:15px;margin-bottom:20px}
+@media(max-width:800px){.xp-grid-cards{gap:18px}.xp-grid-cards .xp-card-body{padding:18px 18px 20px}.xp-grid-cards .xp-card h3{font-size:24px}}
+@media(prefers-reduced-motion:reduce){.xp-grid-cards .xp-card{transition:none}.xp-grid-cards .xp-card:hover{transform:none}}

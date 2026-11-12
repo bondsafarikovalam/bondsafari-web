@@ -31,13 +31,14 @@ const rank = (e: Experience) => leaders.includes(e.slug) ? leaders.indexOf(e.slu
 // Title lines slide up from behind their masks, in CSS so they show without waiting for JavaScript
 const Mask = (props: { children: React.ReactNode; delay?: number }) => <CssMask from="105%" duration={1.6} {...props} />
 
-function Card({ e, index, featured }: { e: Experience; index: number; featured: boolean }) {
+function Card({ e, index }: { e: Experience; index: number }) {
   const cta = ctaOf(e.title, statusOf(e.slug))
-  return <m.article layout className={`xp-card${featured ? ' is-featured' : ''}`} initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96 }} transition={{ duration: 0.8, ease, delay: Math.min(index, 6) * 0.06 }}>
+  // Only the activity's cover from the events API (logout.world); without one the card keeps a plain background
+  const cover = /^https?:\/\//i.test(e.image) ? e.image : undefined
+  return <m.article layout className="xp-card" initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96 }} transition={{ duration: 0.8, ease, delay: Math.min(index, 6) * 0.06 }}>
     <Link className="xp-card-media" href={`/activities/${e.slug}`} aria-label={`${e.title} — view details`}>
-      <Image src={e.image} alt="" fill sizes={featured ? '(max-width: 800px) 100vw, 66vw' : '(max-width: 800px) 100vw, 33vw'} style={{ objectPosition: e.imagePosition }} />
+      {cover && <Image src={cover} alt="" fill sizes="(max-width: 800px) 100vw, (max-width: 1100px) 50vw, 33vw" />}
       <span className="xp-card-num">{String(index + 1).padStart(2, '0')}</span>
-      {featured && <span className="xp-card-flag"><Sparkles /> Signature activity</span>}
       <span className="xp-card-price">{e.price ? e.price.replace(' per person', '') : 'Contact for price'}{e.price && <small>/ person</small>}</span>
     </Link>
     <div className="xp-card-body">
@@ -128,9 +129,9 @@ export function Experiences({ initial = [] }: { initial?: Experience[] }) {
         <p className="xp-filter-count" aria-live="polite">Showing <b>{shown.length}</b> of {activities.length}{loading ? ' · Loading…' : ''}</p>
       </div>
 
-      <m.div layout className="xp-grid">
+      <m.div layout className="xp-grid xp-grid-cards">
         <AnimatePresence mode="popLayout">
-          {shown.map((e, i) => <Card key={e.slug} e={e} index={i} featured={group === 'All' && i === 0} />)}
+          {shown.map((e, i) => <Card key={e.slug} e={e} index={i} />)}
         </AnimatePresence>
       </m.div>
       </LayoutMotion>
