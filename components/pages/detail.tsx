@@ -10,14 +10,14 @@ import { contact } from '@/data/site'
 import { statusLabel, type Fact, type Faq, type ItemType, type Kind, type Status, type Step } from '@/data/programmes'
 import { Brochure } from '@/components/pages/brochure'
 import { Cta } from '@/components/booking/book'
-import { ctaOf, eventOfHref } from '@/lib/booking/cta'
+import { ctaOf } from '@/lib/booking/cta'
 import { Header } from '@/components/layout/header'
 import { Mask as CssMask, enter } from '@/components/layout/intro'
 
 const ease = [0.19, 1, 0.22, 1] as const
 const rise = { hidden: { opacity: 0, y: 36 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1, ease, delay: i * 0.08 } }) }
 
-export type DetailItem = { title: string; event?: string; category: string; duration: string; price?: string; image: string; imagePosition?: string; eyebrow?: string; description?: string; tagline?: string; overview?: string[]; details?: string[]; brochure?: string; section: { label: string; href: string }
+export type DetailItem = { title: string; category: string; duration: string; price?: string; image: string; imagePosition?: string; eyebrow?: string; description?: string; tagline?: string; overview?: string[]; details?: string[]; brochure?: string; section: { label: string; href: string }
   // Course information: each section shows only when the course has it
   type?: ItemType; kind?: Kind; level?: string; status?: Status; location?: string; requirements?: Fact[]; performance?: Fact[]; learn?: string[]; training?: Step[]; safety?: string[]; certification?: string; next?: { title: string; href: string }; faqs?: Faq[]; verify?: string
   // Activity information from the events API
@@ -56,7 +56,7 @@ export function Detail({ item, related }: { item: DetailItem; related: RelatedIt
   const fade = useTransform(scrollYProgress, [0, 0.6], [1, 0])
   const overview = item.overview?.length ? item.overview : item.description ? [item.description] : []
   const details = item.details ?? []
-  const cta = ctaOf(item.title, item.event, item.status)
+  const cta = ctaOf(item.title, item.status)
   const asked = item.status && item.status !== 'bookable'
   const facts = [['Duration', item.duration], ['Type', item.type ? (item.type === 'Activity' ? 'Activity' : `${item.type} · certification`) : item.category], ['Price', item.price ?? 'Contact for price'], item.location ? ['Location', item.location] : ['Good to know', item.eyebrow ?? 'All ages welcome']]
   // At a glance: only what the item records; location, price and duration already lead the page in the hero
@@ -179,7 +179,7 @@ export function Detail({ item, related }: { item: DetailItem; related: RelatedIt
           <div className="dt-related-img"><Image src={r.image} alt={r.title} fill sizes="(max-width: 800px) 80vw, 26vw" style={{ objectPosition: r.imagePosition }} />{r.price && <span className="dt-related-price">{r.price.replace(' per person', '')}</span>}</div>
           <div className="dt-related-info"><span>{r.category}{r.duration && ` · ${r.duration}`}</span><h3>{r.title}</h3>{r.tagline && <p>{r.tagline}</p>}<i><ArrowUpRight /></i></div>
         </Link>
-        {(() => { const c = ctaOf(r.title, eventOfHref(r.href), r.status); return <Cta cta={c} className="dt-related-book">{c.external ? c.label : `Book ${r.title}`} <ArrowRight /></Cta> })()}
+        {(() => { const c = ctaOf(r.title, r.status); return <Cta cta={c} className="dt-related-book">{c.external ? c.label : `Book ${r.title}`} <ArrowRight /></Cta> })()}
       </m.div>)}</div>
     </section>}
 

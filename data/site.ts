@@ -8,6 +8,9 @@ export const contact = {
   whatsapp: '918448448846',
 }
 
+// The logout.world checkout every Book button opens: the company and its saved widget (from the embed code)
+export const checkout = { company: 'bond-safari', widget: '62e5a81c-bc7a-4f38-b679-352aa9dbfa66' }
+
 // Trust facts for the home page strip. Leave a value null until it's confirmed from a real source:
 // the strip shows only what's filled in (e.g. google: { rating: 4.8, count: 1200, url: 'https://g.page/…' })
 export const business = {

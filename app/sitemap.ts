@@ -9,7 +9,7 @@ import { listActivities, listCourses, listEvents } from '@/lib/api/events-server
 export const revalidate = 3600
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const pages = ['/', '/activities', '/courses', '/about', '/gallery', '/blog', '/contact']
+  const pages = ['/', '/activities', '/courses', '/about', '/gallery', '/blog', '/faq', '/contact']
   const known = new Set([...products.map(hrefOf), ...programmes.map(p => `/courses/${p.slug}`)])
   // Activities and courses that only the API has, so a newly published one is listed too
   const [activities, courses, events] = await Promise.all([listActivities(), listCourses(), listEvents()])

@@ -9,7 +9,7 @@ import { useEffect, useRef, useState } from 'react'
 
 // Kept out of site.tsx so inner pages don't download the home hero's code just to render the header
 
-const nav = [['Home','/'], ['Activities','/activities'], ['Courses','/courses'], ['About','/about'], ['Gallery','/gallery'], ['Blog & News','/blog'], ['Contact','/contact']]
+const nav = [['Home','/'], ['Activities','/activities'], ['Courses','/courses'], ['About','/about'], ['Gallery','/gallery'], ['Blog & News','/blog'], ['FAQ','/faq'], ['Contact','/contact']]
 
 // A section stays highlighted on its detail pages too (e.g. /courses/rescue-diver lights up Courses)
 const isActive = (path: string, href: string) => href === '/' ? path === '/' : path === href || path.startsWith(`${href}/`)

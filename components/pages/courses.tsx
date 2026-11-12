@@ -1,16 +1,16 @@
 'use client'
 
 import { Cta } from '@/components/booking/book'
-import { ctaOf, eventOfHref } from '@/lib/booking/cta'
+import { ctaOf } from '@/lib/booking/cta'
 import Image from '@/components/ui/photo'
 import Link from 'next/link'
 import { m, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { ArrowDown, ArrowRight, Award, Briefcase, Clock, Gauge, GraduationCap, Phone, Route, Ship, ShieldCheck, Sparkles, UserRound, Waves } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { courses, pathway } from '@/data/courses'
-import { categoryPathways, coursesPage, coursesPageAliases, enquiryMessage, levelOf, listingOf, programmeOf, type Listing } from '@/data/programmes'
+import { categoryPathways, coursesPage, coursesPageAliases, levelOf, listingOf, programmeOf, type Listing } from '@/data/programmes'
 import { Card } from '@/components/pages/programmes'
-import { contact, whatsappLink } from '@/data/site'
+import { contact } from '@/data/site'
 import { Header } from '@/components/layout/header'
 import { LayoutMotion } from '@/components/layout/motion-provider'
 import { PadiPathway, type PathStep } from '@/components/sections/pathway'
@@ -115,7 +115,7 @@ export function Courses({ live = [] }: { live?: ApiCourse[] }) {
         <h1><Mask delay={0.3}>Learn to dive.</Mask><br /><Mask delay={0.45}><i>Then lead.</i></Mask></h1>
         <p className={`xp-hero-sub ${enter({ y: 16, duration: 1.2 }).className}`} style={enter({ y: 16, duration: 1.2 }).style}>Internationally recognised PADI courses in Kovalam — from your very first breath underwater to becoming an instructor.</p>
         <div className={`xp-hero-actions ${enter({ y: 16, duration: 1.2, delay: 0.85 }).className}`} style={enter({ y: 16, duration: 1.2, delay: 0.85 }).style}>
-          <Cta cta={ctaOf(start.title, eventOfHref(`/courses/${start.slug}`))} className="book-cta"><span className="book-cta-label"><strong>Start with Open Water</strong><small>{start.duration} · {start.price}</small></span><span className="book-cta-icon"><ArrowRight /></span></Cta>
+          <Cta cta={ctaOf(start.title)} className="book-cta"><span className="book-cta-label"><strong>Start with Open Water</strong><small>{start.duration} · {start.price}</small></span><span className="book-cta-icon"><ArrowRight /></span></Cta>
           <a className="text-link light" href="#pathway">See the pathway <ArrowRight /></a>
         </div>
       </m.div>
@@ -189,7 +189,8 @@ export function Courses({ live = [] }: { live?: ApiCourse[] }) {
           </ul>
           <div className="cs-feature-foot">
             <div className="cs-feature-price"><small>{feature.meta}</small><b>{feature.price}</b></div>
-            <a className="book-cta" href={whatsappLink(enquiryMessage(listingOf(feature.slug)?.title ?? feature.title))} target="_blank" rel="noopener noreferrer"><span className="book-cta-label"><strong>{feature.cta}</strong><small>{feature.ctaNote}</small></span><span className="book-cta-icon"><ArrowRight /></span></a>
+            {/* A featured course the API marks bookable opens the booking; otherwise it's an enquiry */}
+            {(() => { const name = listingOf(feature.slug)?.title ?? feature.title; const cta = ctaOf(name, featuredLive?.bookable ? 'bookable' : 'enquire'); return <Cta cta={cta} className="book-cta"><span className="book-cta-label"><strong>{cta.book ? cta.label : feature.cta}</strong><small>{feature.ctaNote}</small></span><span className="book-cta-icon"><ArrowRight /></span></Cta> })()}
           </div>
         </div>
       </m.div>
