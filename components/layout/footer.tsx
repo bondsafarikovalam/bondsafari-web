@@ -26,6 +26,6 @@ export function Footer() {
       </ul>
     </div>
     <div><p className="eyebrow">Follow along</p><ul className="footer-social">{socials.map(([label, href]) => <li key={label}><a href={href} target="_blank" rel="noreferrer" aria-label={`Bond Safari on ${label}`} title={label}><SocialIcon label={label} /></a></li>)}</ul></div>
-    <div className="footer-bottom">© {new Date().getFullYear()} Bond Safari Kovalam <span>In partnership with Cool Divers SL, Spain</span></div>
+    <div className="footer-bottom">© {new Date().getFullYear()} Bond Safari Kovalam <span>In partnership with Cool Divers SL, Spain · <Link href="/faq">FAQ</Link></span></div>
   </footer>
 }

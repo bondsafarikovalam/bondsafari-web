@@ -2,7 +2,7 @@ import Image from '@/components/ui/photo'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { Cta } from '@/components/booking/book'
-import { ctaOf, eventOfHref } from '@/lib/booking/cta'
+import { ctaOf } from '@/lib/booking/cta'
 import { ageLabel, inr, taxLabel } from '@/data/catalogue'
 import { bySlug, hrefOf, type Product } from '@/data/products'
 import type { Landing } from '@/data/landing'
@@ -27,7 +27,7 @@ export function LandingPage({ page }: { page: Landing }) {
           <td>{ageLabel(p) ?? '—'}</td>
           <td>{p.amount ? <>₹{inr(p.amount)}{taxLabel(p) && <small> {taxLabel(p)}</small>}</> : 'Contact for price'}</td>
           <td>{isBookable(p.slug)
-            ? <Cta cta={ctaOf(p.title, eventOfHref(hrefOf(p)))} className="text-link">Book <ArrowRight /></Cta>
+            ? <Cta cta={ctaOf(p.title)} className="text-link">Book <ArrowRight /></Cta>
             : <a className="text-link" href={whatsappLink(enquiryMessage(p.title))} target="_blank" rel="noopener noreferrer">{statusOf(p.slug) === 'apply' ? 'Apply' : 'Enquire'} <ArrowRight /></a>}</td>
         </tr>)}</tbody>
       </table></Reveal>}

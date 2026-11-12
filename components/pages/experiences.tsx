@@ -11,7 +11,7 @@ import { Header } from '@/components/layout/header'
 import { LayoutMotion } from '@/components/layout/motion-provider'
 import { TypeKey } from '@/components/pages/programmes'
 import { Cta } from '@/components/booking/book'
-import { ctaOf, eventSlugOf } from '@/lib/booking/cta'
+import { ctaOf } from '@/lib/booking/cta'
 import { statusOf } from '@/data/programmes'
 import { Mask as CssMask, enter } from '@/components/layout/intro'
 import { useEventsStore } from '@/lib/stores/events'
@@ -32,7 +32,7 @@ const rank = (e: Experience) => leaders.includes(e.slug) ? leaders.indexOf(e.slu
 const Mask = (props: { children: React.ReactNode; delay?: number }) => <CssMask from="105%" duration={1.6} {...props} />
 
 function Card({ e, index, featured }: { e: Experience; index: number; featured: boolean }) {
-  const cta = ctaOf(e.title, eventSlugOf(e.slug), statusOf(e.slug))
+  const cta = ctaOf(e.title, statusOf(e.slug))
   return <m.article layout className={`xp-card${featured ? ' is-featured' : ''}`} initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96 }} transition={{ duration: 0.8, ease, delay: Math.min(index, 6) * 0.06 }}>
     <Link className="xp-card-media" href={`/activities/${e.slug}`} aria-label={`${e.title} — view details`}>
       <Image src={e.image} alt="" fill sizes={featured ? '(max-width: 800px) 100vw, 66vw' : '(max-width: 800px) 100vw, 33vw'} style={{ objectPosition: e.imagePosition }} />

@@ -6,12 +6,12 @@ import { m } from 'framer-motion'
 import { ArrowRight, ArrowUpRight, Clock, MapPin } from 'lucide-react'
 import { statusLabel, typeInfo, type ItemType, type Listing } from '@/data/programmes'
 import { Cta } from '@/components/booking/book'
-import { ctaOf, eventOfHref } from '@/lib/booking/cta'
+import { ctaOf } from '@/lib/booking/cta'
 
 const ease = [0.19, 1, 0.22, 1] as const
 
 export function Card({ l, index }: { l: Listing; index: number }) {
-  const cta = ctaOf(l.title, eventOfHref(l.href), l.status)
+  const cta = ctaOf(l.title, l.status)
   return <m.article layout className="xp-card cs-card pg-card" initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96 }} transition={{ duration: 0.8, ease, delay: Math.min(index, 6) * 0.06 }}>
     <Link className="xp-card-media" href={l.href} aria-label={`${l.title} — view details`}>
       <Image src={l.image} alt="" fill sizes="(max-width: 800px) 100vw, 33vw" style={{ objectPosition: l.imagePosition }} />

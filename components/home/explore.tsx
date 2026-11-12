@@ -7,7 +7,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import { statusOf } from '@/data/programmes'
 import { Cta } from '@/components/booking/book'
-import { ctaOf, eventOfHref } from '@/lib/booking/cta'
+import { ctaOf } from '@/lib/booking/cta'
 
 const cards = [
   { title: 'PADI Discover Scuba Diving', kind: 'Activity', bookAs: 'PADI Discover Scuba Diving', href: '/activities/scuba-diving', image: '/images/scuba.webp', text: 'Your first breath underwater in the Arabian Sea: a short briefing, shallow-water practice, then an open-sea dive of up to 12 m with a PADI Instructor or Divemaster beside you. No swimming needed.', tagline: 'Discover the unknown world in a day!' },
@@ -49,7 +49,7 @@ function Card({ c, i, active, pos, reduce, onSelect }: { c: typeof cards[number]
       <h3><span>{c.title}</span></h3>
       <p className="explore-text">{c.text}</p>
       <p className="explore-tagline">{c.tagline}</p>
-      <div className="explore-actions">{(() => { const cta = ctaOf(c.bookAs, eventOfHref(c.href), statusOf(c.href.split('/').pop()!)); return <Cta cta={cta} className="book-cta book-cta-sm" tabIndex={active ? 0 : -1}><span className="book-cta-label"><strong>{cta.label}</strong></span><span className="book-cta-icon"><ArrowRight /></span></Cta> })()}<Link className="explore-link" href={c.href} tabIndex={active ? 0 : -1}>Explore <ArrowRight /></Link></div>
+      <div className="explore-actions">{(() => { const cta = ctaOf(c.bookAs, statusOf(c.href.split('/').pop()!)); return <Cta cta={cta} className="book-cta book-cta-sm" tabIndex={active ? 0 : -1}><span className="book-cta-label"><strong>{cta.label}</strong></span><span className="book-cta-icon"><ArrowRight /></span></Cta> })()}<Link className="explore-link" href={c.href} tabIndex={active ? 0 : -1}>Explore <ArrowRight /></Link></div>
     </div>
   </m.li>
 }

@@ -15,7 +15,7 @@ export const revalidate = 300
 const apiCourse = async (slug: string) => {
   const listed = (await courseRecords()).find(x => siteSlugOf(x.slug) === slug)
   const record = listed && await getEventRecord('courses', listed.slug)
-  return record && { ...eventToExperience(record), brochure: brochureOf(listed.slug), event: listed.slug }
+  return record && { ...eventToExperience(record), brochure: brochureOf(listed.slug) }
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -41,9 +41,12 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const course = (item: { title: string; description?: string; image?: string; price?: string }) => offeringLd({ kind: 'course', name: item.title, description: item.description, image: item.image, path: `/courses/${slug}`, price: item.price, seller: 'Bond Academy' })
   const live = await listCourses()
   const events = await listEvents()
+  // A course the API lists is bookable or takes enquiries as the API says; otherwise the site's own status stands
+  const liveCourse = live.find(x => x.slug === slug)
+  const status = liveCourse ? (liveCourse.bookable ? 'bookable' as const : 'enquire' as const) : undefined
   const api = await apiCourse(slug)
   // The site keeps its structured copy; the title, price, duration, photo and policies are the API's
-  const fresh = api && { title: api.title, price: api.price?.replace(' per person', ''), duration: api.duration, image: api.image, imagePosition: undefined, policies: api.policies, brochure: api.brochure, event: api.event }
+  const fresh = api && { title: api.title, price: api.price?.replace(' per person', ''), duration: api.duration, image: api.image, imagePosition: undefined, policies: api.policies, brochure: api.brochure }
   const c = courses.find(x => x.slug === slug)
   if (c) {
     const next = courseNext[slug] ? listingOf(courseNext[slug]) : undefined
@@ -51,19 +54,19 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     // Zero to Hero is a programme of five stages: list them on its own page as well as on the Scuba page
     const training = slug === 'zero-to-hero' ? zeroToHeroStages.map(s => ({ title: listingOf(s.slug)!.title, text: s.text })) : undefined
     const shown = { ...c, ...fresh }
-    return <><JsonLd data={[crumbsTo(shown.title), course(shown)]} /><Detail item={{ ...c, type: 'Course', status: statusOf(slug), level: levelOf(slug), category: c.level, eyebrow: c.minAge ? `Min. age ${c.minAge}` : c.eyebrow, location: 'Kovalam', requirements, training, next: next && { title: next.title, href: next.href }, section, ...fresh }} related={relatedFor(slug, live, events, courseNext[slug])} /></>
+    return <><JsonLd data={[crumbsTo(shown.title), course(shown)]} /><Detail item={{ ...c, type: 'Course', status: status ?? statusOf(slug), level: levelOf(slug), category: c.level, eyebrow: c.minAge ? `Min. age ${c.minAge}` : c.eyebrow, location: 'Kovalam', requirements, training, next: next && { title: next.title, href: next.href }, section, ...fresh }} related={relatedFor(slug, live, events, courseNext[slug])} /></>
   }
   const p = programmeOf(slug)
   if (!p) {
     if (!api) notFound()
-    return <><JsonLd data={[crumbsTo(api.title), course(api)]} /><Detail item={{ ...api, type: 'Course', status: 'bookable', level: api.difficulty, category: 'Certification', section }} related={relatedFor(slug, live, events)} /></>
+    return <><JsonLd data={[crumbsTo(api.title), course(api)]} /><Detail item={{ ...api, type: 'Course', status: status ?? 'bookable', level: api.difficulty, category: 'Certification', section }} related={relatedFor(slug, live, events)} /></>
   }
   const next = p.next ? listingOf(p.next) : undefined
   const shown = { ...p, ...fresh }
   // A programme that isn't open yet has no price to offer
-  const ld = [crumbsTo(shown.title), ...(p.status === 'bookable' || fresh ? [course(shown)] : []), ...(p.faqs?.length ? [faqLd(p.faqs)] : [])]
+  const ld = [crumbsTo(shown.title), ...((status ?? p.status) === 'bookable' || fresh ? [course(shown)] : []), ...(p.faqs?.length ? [faqLd(p.faqs)] : [])]
   return <>
     <JsonLd data={ld} />
-    <Detail item={{ ...p, type: typeOfKind(p.kind), level: levelOf(slug), category: p.kind, duration: p.duration ?? 'Schedule varies', eyebrow: statusLabel[p.status], next: next && { title: next.title, href: next.href }, section, ...fresh }} related={relatedFor(slug, live, events, p.next)} />
+    <Detail item={{ ...p, type: typeOfKind(p.kind), level: levelOf(slug), category: p.kind, duration: p.duration ?? 'Schedule varies', status: status ?? p.status, eyebrow: statusLabel[status ?? p.status], next: next && { title: next.title, href: next.href }, section, ...fresh }} related={relatedFor(slug, live, events, p.next)} />
   </>
 }

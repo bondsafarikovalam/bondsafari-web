@@ -2,7 +2,10 @@ import axios from 'axios'
 import { cache } from 'react'
 import { activitiesFrom, apiSlugOf, catalogueEvent, eventToExperience, type EventRecord, type EventsResponse } from '@/lib/api/events'
 import { experiences } from '@/data/experiences'
-import { toApiCourse } from '@/lib/api/courses'
+import { courses } from '@/data/courses'
+import { programmes } from '@/data/programmes'
+import { checkout } from '@/data/site'
+import { siteSlugOf, toApiCourse } from '@/lib/api/courses'
 
 const listUrl = () => process.env.EVENTS_API_URL || 'https://logout.world/api/company/events/'
 
@@ -28,11 +31,59 @@ async function listAll(catalogue: Catalogue): Promise<EventRecord[]> {
   }
 }
 
-export const listEvents = cache(() => listAll('activities'))
+// The checkout's catalog marks each event as an activity or a course (offering_type). It is public and lists only
+// the events in the saved checkout widget, so events it doesn't cover are classified by the site's own course pages
+type CatalogEvent = { slug: string; offering_type?: string; bookable?: boolean }
+type CatalogPage = { events: CatalogEvent[]; pagination?: { next_page?: number | null } }
+const catalogUrl = `https://logout.world/checkout-api/v1/companies/${checkout.company}/widgets/${checkout.widget}/catalog/`
+const offeringTypes = cache(async () => {
+  const types = new Map<string, string>()
+  const unbookable = new Set<string>()
+  try {
+    for (let page: number | null = 1; page; ) {
+      const data: CatalogPage = (await axios.get<CatalogPage>(catalogUrl, { params: { page }, timeout: 15000 })).data
+      data.events.forEach((e: CatalogEvent) => { if (e.offering_type) types.set(e.slug, e.offering_type); if (e.bookable === false) unbookable.add(e.slug) })
+      page = data.pagination?.next_page ?? null
+    }
+  } catch (error) {
+    console.error('Checkout catalog: could not load offering types', axios.isAxiosError(error) ? error.response?.status ?? error.code : error)
+  }
+  return Object.assign(types, { unbookable })
+})
+const siteCourses = new Set([...courses, ...programmes].map(c => c.slug))
+const looksLikeCourse = (e: EventRecord) => siteCourses.has(siteSlugOf(e.slug)) || /\b(course|mermaid|freediv\w*|divemaster|instructor)\b/i.test(`${e.slug.replace(/-/g, ' ')} ${e.name}`)
+const isCourse = (e: EventRecord, types: Map<string, string>) => {
+  const type = types.get(e.slug)
+  return type ? type === 'course' : looksLikeCourse(e)
+}
+// Bond Safari's events API also returns its courses: they belong on the Courses page, not on Activities
+export const isCourseEvent = cache(async (slug: string) => {
+  const record = (await listAll('activities')).find(e => e.slug === slug)
+  return !!record && isCourse(record, await offeringTypes())
+})
+
+export const withoutCourses = async (events: EventRecord[]) => {
+  const types = await offeringTypes()
+  return events.filter(e => !isCourse(e, types))
+}
+
+export const listEvents = cache(async () => {
+  const [events, types] = await Promise.all([listAll('activities'), offeringTypes()])
+  return events.filter(e => !isCourse(e, types))
+})
 // What the Activities page lists, so its first render already has the API's photos and prices
 export const listActivities = cache(async () => activitiesFrom(await listEvents()))
-export const courseRecords = cache(async () => (await listAll('courses')).filter(event => event.publish !== false))
-export const listCourses = cache(async () => (await courseRecords()).map(toApiCourse))
+// The Courses page lists exactly these: the academy's courses plus the published courses in Bond Safari's list
+export const courseRecords = cache(async () => {
+  const [academy, events, types] = await Promise.all([listAll('courses'), listAll('activities'), offeringTypes()])
+  const known = new Set(academy.map(e => e.slug))
+  const extra = events.filter(e => isCourse(e, types) && !known.has(e.slug))
+  return [...academy, ...extra].filter(event => event.publish !== false)
+})
+export const listCourses = cache(async () => {
+  const { unbookable } = await offeringTypes()
+  return (await courseRecords()).map(e => toApiCourse(e, !unbookable.has(e.slug)))
+})
 
 // One event for its own page: the single-event endpoint has the current price and dates but none of the copy or images,
 // so it goes over the list's record. Its empty fields are skipped, and if the call fails the page still has the list's
