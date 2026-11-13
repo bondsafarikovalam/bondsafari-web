@@ -552,8 +552,10 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}html::-webkit-scrollbar,b
 .in-fade{animation-name:in-fade}
 .in-rise{animation-name:in-rise}
 .in-mask{animation:in-mask var(--in-t,1.6s) cubic-bezier(.19,1,.22,1) var(--in-d,0s) backwards}
-@keyframes in-fade{from{opacity:0}}
-@keyframes in-rise{from{opacity:0;transform:translate(var(--in-x,0),var(--in-y,0))}}
+/* Fades start at 1% opacity, not 0: it looks the same, but Chrome only counts an element for Largest Contentful Paint once
+   it is painted visible, and an element fading in from 0 is not counted until its animation ends (LCP was 1.2-3 s later) */
+@keyframes in-fade{from{opacity:.01}}
+@keyframes in-rise{from{opacity:.01;transform:translate(var(--in-x,0),var(--in-y,0))}}
 @keyframes in-mask{from{transform:translateY(var(--in-from,105%))}}
 @media(prefers-reduced-motion:reduce){.in-fade,.in-rise,.in-mask{animation:none}}
 /* Looping decorations hold still while the page scrolls (components/layout/scroll-pause.tsx): they repaint every frame */

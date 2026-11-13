@@ -34,5 +34,8 @@ COPY --from=build --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=build --chown=nextjs:nodejs /app/public ./public
 USER nextjs
 EXPOSE 3000
-HEALTHCHECK --interval=30s --timeout=5s --start-period=20s CMD wget -qO- http://127.0.0.1:3000/api/health || exit 1
-CMD ["node", "server.js"]
+# Docker HEALTHCHECK is used by ECS/docker run; App Runner ignores it, so set its health check path to /api/health too
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s CMD wget -q --spider http://127.0.0.1:3000/api/health || exit 1
+# Container runtimes (Docker, ECS, Kubernetes) may overwrite HOSTNAME with the container's own name at start-up, and the
+# Next.js server binds to HOSTNAME, so it is set again here. exec keeps node as PID 1 so it gets SIGTERM on shutdown
+CMD ["sh", "-c", "HOSTNAME=0.0.0.0 exec node server.js"]
