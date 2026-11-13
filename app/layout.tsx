@@ -19,4 +19,4 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { colorScheme: 'light', themeColor: '#082D3A', width: 'device-width', initialScale: 1 }
 const display = Jost({ subsets: ['latin'], weight: ['300', '400'], variable: '--font-display' })
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="en" className={display.variable}><body><JsonLd data={localBusinessLd()} /><MotionProvider>{children}<Footer /><Widgets /></MotionProvider>{process.env.NODE_ENV === 'production' && <Analytics />}</body></html> }
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="en" className={display.variable}><body><JsonLd data={localBusinessLd()} /><MotionProvider>{children}<Footer /><Widgets /></MotionProvider>{process.env.VERCEL === '1' && <Analytics />}</body></html> }

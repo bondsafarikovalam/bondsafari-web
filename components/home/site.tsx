@@ -4,13 +4,14 @@ import Image from '@/components/ui/photo'
 import Link from 'next/link'
 import { m, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { preload } from 'react-dom'
 import { Header, Reveal } from '@/components/layout/header'
 import { experiences } from '@/data/experiences'
 import { whatsappLink } from '@/data/site'
 import { WhatsAppIcon } from '@/components/layout/whatsapp'
 import { Mask as CssMask, enter } from '@/components/layout/intro'
+import { BookLink } from '@/components/booking/book'
 
 
 // Small local posters (the first thing painted) and a lighter video for phones. Each size comes as VP9 WebM (about 45%
@@ -19,6 +20,8 @@ const posterSrcSet = '/images/hero-poster-mobile.webp 800w, /images/hero-poster.
 
 // Skip the video on data saver, slow connections and reduced motion: the poster stays instead
 type NetInfo = { saveData?: boolean; effectiveType?: string }
+// Nothing to subscribe to: whether video may play is read once in the browser, and the server render never plays it
+const unchanging = () => () => {}
 const videoAllowed = () => {
   const c = (navigator as Navigator & { connection?: NetInfo }).connection
   return !(c?.saveData || ['slow-2g', '2g', '3g'].includes(c?.effectiveType ?? ''))
@@ -32,8 +35,7 @@ const Mask = (props: { children: React.ReactNode; delay?: number; className?: st
 export function Hero() {
   const reduce = useReducedMotion()
   // The video mounts only after hydration, so the poster paints first and the video never competes with it
-  const [playVideo, setPlayVideo] = useState(false)
-  useEffect(() => { setPlayVideo(!reduce && videoAllowed()) }, [reduce])
+  const playVideo = useSyncExternalStore(unchanging, () => !reduce && videoAllowed(), () => false)
   preload('/images/hero-poster.webp', { as: 'image', fetchPriority: 'high', imageSrcSet: posterSrcSet, imageSizes: '100vw' })
   // The video stays fixed behind the page while the content slides over it; once covered it pauses and stops painting
   const scene = useRef<HTMLElement>(null)
@@ -49,6 +51,8 @@ export function Hero() {
   useEffect(() => { const v = video.current; if (!v) return; if (covered) v.pause(); else v.play().catch(() => {}) }, [covered, playVideo])
   return <section ref={scene} className={covered ? 'hero-scene is-covered' : 'hero-scene'}><div className="hero">
     <div className={`hero-media ${enter({ duration: 3 }).className}`} style={enter({ duration: 3 }).style}><div className="hero-media-inner">
+      {/* A plain <img> on purpose: it is preloaded above with fetchPriority high as the LCP image, already in WebP sizes */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img className="hero-poster" src="/images/hero-poster.webp" srcSet={posterSrcSet} sizes="100vw" alt="" fetchPriority="high" decoding="async" />
       {playVideo && <video ref={video} autoPlay muted loop playsInline preload="metadata" aria-hidden="true"><source media="(max-width: 800px)" src="/videos/scuba-540.webm" type='video/webm; codecs="vp9"' /><source media="(max-width: 800px)" src="/videos/scuba-540.mp4" type="video/mp4" /><source src="/videos/scuba-720.webm" type='video/webm; codecs="vp9"' /><source src="/videos/scuba-720.mp4" type="video/mp4" /></video>}
     </div></div>
@@ -62,7 +66,7 @@ export function Hero() {
     </div>
     <div className="hero-scroll">
       <span className={`hero-ctas ${enter({ y: 20, duration: 1.5, delay: 1.4 }).className}`} style={enter({ y: 20, duration: 1.5, delay: 1.4 }).style}>
-        <Link className="pill pill-light hero-book" href="/activities">Book now <ArrowRight /></Link>
+        <BookLink className="pill pill-light hero-book" href="/activities">Book now <ArrowRight /></BookLink>
         <a className="pill pill-sand hero-wa" href={whatsappLink('Hello Bond Safari! I’d like to book an adventure in Kovalam.')} target="_blank" rel="noreferrer"><WhatsAppIcon /> WhatsApp</a>
       </span>
     </div>

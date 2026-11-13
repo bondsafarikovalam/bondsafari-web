@@ -10,7 +10,7 @@ import { contact } from '@/data/site'
 import { Header } from '@/components/layout/header'
 import { LayoutMotion } from '@/components/layout/motion-provider'
 import { TypeKey } from '@/components/pages/programmes'
-import { Cta } from '@/components/booking/book'
+import { BookLink, Cta } from '@/components/booking/book'
 import { ctaOf } from '@/lib/booking/cta'
 import { statusOf } from '@/data/programmes'
 import { Mask as CssMask, enter } from '@/components/layout/intro'
@@ -59,7 +59,7 @@ export function Experiences({ initial = [] }: { initial?: Experience[] }) {
   const activities = loaded || !initial.length ? stored : initial
   const fetchEvents = useEventsStore(s => s.fetchEvents)
   const loading = useEventsStore(s => s.loading)
-  useEffect(() => { void fetchEvents() }, [fetchEvents])
+  useEffect(() => { if (!initial.length) void fetchEvents() }, [fetchEvents, initial.length])
   const reduce = useReducedMotion()
   const hero = useRef<HTMLElement>(null)
   const [group, setGroup] = useState<typeof groups[number]>('All')
@@ -94,7 +94,7 @@ export function Experiences({ initial = [] }: { initial?: Experience[] }) {
         <h1><Mask delay={0.3}>Choose your</Mask><br /><Mask delay={0.45}><i>adventure.</i></Mask></h1>
         <p className={`xp-hero-sub ${enter({ y: 16, duration: 1.2 }).className}`} style={enter({ y: 16, duration: 1.2 }).style}>Underwater scooters, guided dives, snorkelling, kayaking and coracle rides — for every age and ability, with all equipment included.</p>
         <div className={`xp-hero-actions ${enter({ y: 16, duration: 1.2, delay: 0.85 }).className}`} style={enter({ y: 16, duration: 1.2, delay: 0.85 }).style}>
-          <Link className="book-cta" href="#all-activities"><span className="book-cta-label"><strong>Book an adventure</strong><small>From ₹{fromPrice} per person</small></span><span className="book-cta-icon"><ArrowRight /></span></Link>
+          <BookLink className="book-cta" href="#all-activities"><span className="book-cta-label"><strong>Book an adventure</strong><small>From ₹{fromPrice} per person</small></span><span className="book-cta-icon"><ArrowRight /></span></BookLink>
           <a className="text-link light" href="#all-activities">Browse all {activities.length} <ArrowRight /></a>
         </div>
       </m.div>
@@ -143,7 +143,7 @@ export function Experiences({ initial = [] }: { initial?: Experience[] }) {
           <m.p className="eyebrow light" variants={rise}>02 — Booking made simple</m.p>
           <m.h2 variants={rise} custom={1}>Your day at sea,<br /><i>reserved in a minute.</i></m.h2>
           <m.div className="xp-book-actions" variants={rise} custom={2}>
-            <Link className="book-cta" href="#all-activities"><span className="book-cta-label"><strong>Book now</strong><small>Reserve your spot</small></span><span className="book-cta-icon"><ArrowRight /></span></Link>
+            <BookLink className="book-cta" href="#all-activities"><span className="book-cta-label"><strong>Book now</strong><small>Reserve your spot</small></span><span className="book-cta-icon"><ArrowRight /></span></BookLink>
             <a className="xp-book-call" href={`tel:${tel}`}><Phone /><span><small>Prefer to talk?</small>{contact.phones[0]}</span></a>
           </m.div>
         </m.div>
@@ -161,6 +161,6 @@ export function Experiences({ initial = [] }: { initial?: Experience[] }) {
       </div>
     </section>
 
-    <div className={`dt-mobile-bar xp-bar${barShown ? ' is-shown' : ''}`} inert={!barShown}><div><b>{experiences.length} activities</b><span>From ₹{fromPrice} per person</span></div><Link className="book-cta book-cta-sm" href="#all-activities"><span className="book-cta-label"><strong>Book</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link></div>
+    <div className={`dt-mobile-bar xp-bar${barShown ? ' is-shown' : ''}`} inert={!barShown}><div><b>{experiences.length} activities</b><span>From ₹{fromPrice} per person</span></div><BookLink className="book-cta book-cta-sm" href="#all-activities"><span className="book-cta-label"><strong>Book</strong></span><span className="book-cta-icon"><ArrowRight /></span></BookLink></div>
   </main>
 }

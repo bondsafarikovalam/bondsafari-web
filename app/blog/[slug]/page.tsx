@@ -8,6 +8,13 @@ import { PostCard } from '@/components/pages/blog'
 import { ArticleBody, headingId } from '@/components/pages/article-body'
 import { contact } from '@/data/site'
 import { JsonLd, abs, breadcrumbLd, pageMeta } from '@/lib/seo'
+import { BookLink } from '@/components/booking/book'
+
+// A "Book …" call to action opens the booking checkout; any other ("Compare the courses") stays a link to its page
+function Action({ className, href, label }: { className: string; href: string; label: string }) {
+  const inner = <><span className="book-cta-label"><strong>{label}</strong></span><span className="book-cta-icon"><ArrowRight /></span></>
+  return /^book\b/i.test(label) ? <BookLink className={className} href={href}>{inner}</BookLink> : <Link className={className} href={href}>{inner}</Link>
+}
 
 export const generateStaticParams = () => posts.map(p => ({ slug: p.slug }))
 
@@ -38,7 +45,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       <article className="bl-article">
         <p className="bl-lead">{p.excerpt}</p>
         <ArticleBody body={p.body} />
-        {p.cta && <Link className="book-cta bl-cta" href={p.cta.href}><span className="book-cta-label"><strong>{p.cta.label}</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link>}
+        {p.cta && <Action className="book-cta bl-cta" href={p.cta.href} label={p.cta.label} />}
       </article>
       <aside className="bl-aside">
         <div className="bl-aside-card">
@@ -49,7 +56,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         <div className="bl-aside-card is-dark">
           <p className="bl-aside-label">Ready to dive in?</p>
           <p className="bl-aside-title">Feel the marvels <i>hidden beneath.</i></p>
-          <Link className="book-cta" href={p.cta?.href ?? '/activities'}><span className="book-cta-label"><strong>{p.cta?.label ?? 'Book now'}</strong></span><span className="book-cta-icon"><ArrowRight /></span></Link>
+          <Action className="book-cta" href={p.cta?.href ?? '/activities'} label={p.cta?.label ?? 'Book now'} />
           <a className="bl-aside-call" href={`tel:${contact.phones[0].replace(/\s/g, '')}`}><Phone /> {contact.phones[0]}</a>
         </div>
       </aside>

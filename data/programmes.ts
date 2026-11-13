@@ -51,7 +51,6 @@ const tecSafety = [
   'Oxygen-clean gas blending and oxygen-compatible equipment for any course using high-oxygen deco gas',
 ]
 const tecKit = 'Technical diving needs serious personal equipment — twin cylinders or sidemount, deco cylinders, redundant regulators and computers, reel and DSMB. It often costs more than the course; we talk it through with you before you enrol.'
-const poolNote = 'Waiting on a dedicated pool lane for breath-hold training. Register your interest and we’ll contact you when it opens.'
 const phase2 = 'Planned for phase two, once chamber and evacuation planning, oxygen-clean blending and a Tec Deep Instructor are in place. Register your interest.'
 const referred = 'Bond does not teach this level. We’ll help you plan the route to it and refer you to an established technical centre.'
 

@@ -4,11 +4,12 @@
 // An answer is a list of blocks: a paragraph, a bold sub-heading, a bullet list or a table
 export type FaqBlock = string | { sub: string } | { list: string[] } | { table: { head: string[]; rows: string[][] } }
 export type FaqItem = { q: string; a: FaqBlock[] }
-export type FaqGroup = { id: string; title: string; subtitle?: string; faqs: FaqItem[]; notes: { title: string; items: string[] } }
+// `image` is the FAQ page's hero photo while this category is selected
+export type FaqGroup = { id: string; title: string; subtitle?: string; image: string; imagePosition?: string; faqs: FaqItem[]; notes: { title: string; items: string[] } }
 
 export const faqGroups: FaqGroup[] = [
   {
-    id: 'parasailing', title: 'Parasailing',
+    id: 'parasailing', title: 'Parasailing', image: '/images/parasailing.webp',
     faqs: [
       {
         q: 'What is parasailing, and how does the experience work?', a: [
@@ -90,7 +91,7 @@ export const faqGroups: FaqGroup[] = [
     },
   },
   {
-    id: 'snorkelling', title: 'Snorkelling', subtitle: 'Shore & Boat Snorkelling',
+    id: 'snorkelling', title: 'Snorkelling', subtitle: 'Shore & Boat Snorkelling', image: '/images/snorkeling-beach.webp',
     faqs: [
       {
         q: 'What is snorkelling, and do I need prior experience?', a: [
@@ -179,7 +180,7 @@ export const faqGroups: FaqGroup[] = [
     },
   },
   {
-    id: 'scuba-diving', title: 'Scuba Diving',
+    id: 'scuba-diving', title: 'Scuba Diving', image: '/images/scuba.webp',
     faqs: [
       {
         q: 'Do I need prior scuba diving experience to go scuba diving?', a: [

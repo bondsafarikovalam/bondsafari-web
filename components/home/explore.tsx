@@ -8,16 +8,9 @@ import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import { statusOf } from '@/data/programmes'
 import { Cta } from '@/components/booking/book'
 import { ctaOf } from '@/lib/booking/cta'
+import { exploreCards, type ExploreCard } from '@/data/explore'
 
-const cards = [
-  { title: 'PADI Discover Scuba Diving', kind: 'Activity', bookAs: 'PADI Discover Scuba Diving', href: '/activities/scuba-diving', image: '/images/scuba.webp', text: 'Your first breath underwater in the Arabian Sea: a short briefing, shallow-water practice, then an open-sea dive of up to 12 m with a PADI Instructor or Divemaster beside you. No swimming needed.', tagline: 'Discover the unknown world in a day!' },
-  { title: 'Sea Life Safari', kind: 'Activity', bookAs: 'Sea Life Safari', href: '/activities/sea-life-safari', image: '/images/sea-life.webp', text: 'This 2.5-hour Sea Life Safari takes you through fantastic moments in the ocean’s aquarium, accompanied by a marine biologist who dives at interesting places, explaining the facts and peculiarities of the mysterious world underwater — with spectacular photo opportunities.', tagline: 'Explore the beauty above and below the sea.' },
-  { title: 'Introduction to Scuba Diving', kind: 'Activity', bookAs: 'Introduction to Scuba Diving', href: '/activities/dive-safari', image: '/images/dive-safari.webp', text: 'An adrenaline-pumping way to experience the silence, the tranquillity, the weightlessness and the heart-touching beauty of the marine world. Plunge into the water for an unforgettable tour with safe, high-quality equipment.', tagline: 'Be cool, dive cool!' },
-  { title: 'Swimming Course', kind: 'Course', bookAs: 'Swimming Course', href: '/courses/swimming-course', image: '/images/swimming.webp', text: 'Bond Safari Kids and Adults are unique programmes designed by national and international swim coaches. Our coordinators and instructors are trained to international standards, with a background in water safety in Trivandrum. Lessons are divided into six separate levels.', tagline: 'Swim well, live well!' },
-  { title: 'Bond Safari', kind: 'Activity', bookAs: 'Bond Safari', href: '/activities/bond-safari', image: '/images/bond-safari.webp', text: 'A unique centre for scuba diving in Kerala, open to anyone without the rigours of typical diving. The self-propelled, eco-friendly electric scooter leads you effortlessly underwater so you can enjoy the magnificent marine life. All age groups can explore with BOND — no diving or scuba experience is necessary.', tagline: 'Sit down, submerge & drive off!' },
-]
 
-const n = cards.length
 const pad = (v: number) => String(v).padStart(2, '0')
 
 // Pointer-driven parallax + spotlight, written straight to CSS variables to avoid re-renders
@@ -31,7 +24,7 @@ function onMove(e: PointerEvent<HTMLDivElement>) {
 }
 function onLeave(e: PointerEvent<HTMLDivElement>) { const s = e.currentTarget.style; s.removeProperty('--mx'); s.removeProperty('--my') }
 
-function Card({ c, i, active, pos, reduce, onSelect }: { c: typeof cards[number]; i: number; active: boolean; pos: MotionValue<number>; reduce: boolean; onSelect: () => void }) {
+function Card({ c, i, active, pos, reduce, onSelect }: { c: ExploreCard; i: number; active: boolean; pos: MotionValue<number>; reduce: boolean; onSelect: () => void }) {
   // Distance from the centre slot (0 = in focus): the photo drifts against the track for depth
   const d = useTransform(pos, v => v - i)
   const imgX = useTransform(d, v => reduce ? '0%' : `${Math.max(-1, Math.min(1, v)) * 10}%`)
@@ -63,7 +56,8 @@ function Segment({ i, pos, active, title, onSelect }: { i: number; pos: MotionVa
   </button>
 }
 
-export function ExploreCarousel({ photos = {} }: { photos?: Record<string, string> }) {
+export function ExploreCarousel({ cards = exploreCards }: { cards?: ExploreCard[] }) {
+  const n = cards.length
   // A tall scene pins the section while vertical scroll drives the track right-to-left
   const scene = useRef<HTMLElement>(null)
   const track = useRef<HTMLUListElement>(null)
@@ -106,11 +100,11 @@ export function ExploreCarousel({ photos = {} }: { photos?: Record<string, strin
       </div>
       <div className="explore-viewport">
         <m.ul ref={track} className="explore-track" style={mobile ? undefined : { x }} onScroll={mobile ? onSwipe : undefined}>
-          {cards.map((c, i) => <Card key={c.title} c={{ ...c, image: photos[c.href] ?? c.image }} i={i} active={i === index} pos={pos} reduce={reduce} onSelect={() => goTo(i)} />)}
+          {cards.map((c, i) => <Card key={c.href} c={c} i={i} active={i === index} pos={pos} reduce={reduce} onSelect={() => goTo(i)} />)}
         </m.ul>
       </div>
       <div className="explore-progress">
-        {cards.map((c, i) => <Segment key={c.title} i={i} pos={pos} active={i === index} title={c.title} onSelect={() => goTo(i)} />)}
+        {cards.map((c, i) => <Segment key={c.href} i={i} pos={pos} active={i === index} title={c.title} onSelect={() => goTo(i)} />)}
       </div>
       <p className="explore-hint" aria-hidden="true" style={{ opacity: index === 0 ? 1 : 0 }}>Scroll to explore <ArrowRight /></p>
     </div>
