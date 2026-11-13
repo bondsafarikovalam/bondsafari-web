@@ -12,12 +12,27 @@ const s3 = new S3Client({ region: process.env.S3_REGION || 'ap-south-1', credent
 
 const known = new Set(galleryFiles)
 
+// A missing setting is reported once in the server log, not on every photo request, and never to the browser
+let warned = false
+const warnOnce = (message: string) => {
+  if (warned) return
+  warned = true
+  console.warn(`Gallery: ${message}`)
+}
+
 export async function GET(_req: Request, { params }: { params: Promise<{ file: string }> }) {
   const { file } = await params
   // Only serve listed gallery photos, never arbitrary keys from the bucket
   if (!known.has(file)) return new Response('Not found', { status: 404 })
+  const bucket = process.env.S3_BUCKET?.trim()
+  if (!bucket) {
+    warnOnce('S3_BUCKET is not set, so gallery photos cannot be served. Set S3_BUCKET (and S3_REGION) in the server environment.')
+    return new Response('Not found', { status: 404 })
+  }
+  // Only one of the two keys set means a typo: the SDK then falls back to its default chain (task role, profile)
+  if (!process.env.S3_ACCESS_KEY_ID !== !process.env.S3_SECRET_ACCESS_KEY) warnOnce('only one of S3_ACCESS_KEY_ID / S3_SECRET_ACCESS_KEY is set, so both are ignored and the default AWS credential chain is used.')
   try {
-    const obj = await s3.send(new GetObjectCommand({ Bucket: process.env.S3_BUCKET, Key: `gallery/${file}` }))
+    const obj = await s3.send(new GetObjectCommand({ Bucket: bucket, Key: `gallery/${file}` }))
     return new Response(obj.Body!.transformToWebStream(), {
       headers: {
         'Content-Type': obj.ContentType ?? 'image/jpeg',

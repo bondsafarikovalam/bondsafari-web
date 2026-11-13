@@ -1,5 +1,7 @@
+import 'server-only'
 import axios from 'axios'
 import { cache } from 'react'
+import { BoundedMap } from '@/lib/bounded-map'
 import { activitiesFrom, apiSlugOf, catalogueEvent, eventToExperience, type EventRecord, type EventsResponse, type LivePages } from '@/lib/api/events'
 import { experiences } from '@/data/experiences'
 import { courses } from '@/data/courses'
@@ -15,13 +17,14 @@ export type Catalogue = keyof typeof apiKeys
 export const hasApiKey = (catalogue: Catalogue) => !!process.env[apiKeys[catalogue]]
 const headersOf = (catalogue: Catalogue) => ({ Accept: 'application/json', Authorization: `Bearer ${process.env[apiKeys[catalogue]]}` })
 
-const describe = (error: unknown) => axios.isAxiosError(error) ? error.response?.status ?? error.code : error
+export const describe = (error: unknown) => axios.isAxiosError(error) ? error.response?.status ?? error.code : error
 
 // logout.world answers in seconds, so its responses are kept in this server's memory for a few minutes instead of being
 // fetched again for every page view. Requests that arrive together share one call; after the TTL the stale copy still
-// answers at once while a fresh one loads, and it stays in use if logout.world is down
+// answers at once while a fresh one loads, and it stays in use if logout.world is down.
+// At most 500 answers are kept (list pages, catalogues and single events); past that the least recently used is dropped
 const TTL = 5 * 60 * 1000
-const kept = new Map<string, { at: number; value: unknown }>()
+const kept = new BoundedMap<string, { at: number; value: unknown }>(500)
 const loading = new Map<string, Promise<unknown>>()
 function remember<T>(key: string, load: () => Promise<T>): Promise<T> {
   const hit = kept.get(key)

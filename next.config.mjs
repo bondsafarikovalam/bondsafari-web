@@ -9,7 +9,36 @@ const securityHeaders = [
   // Other sites may not frame these pages; the booking checkout is a frame inside our page, which this doesn't affect
   { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+  { key: 'Content-Security-Policy-Report-Only', value: contentSecurityPolicy() },
 ]
+
+// Content Security Policy, in REPORT-ONLY mode: browsers block nothing and only log a "[Report Only]" console message
+// for anything outside this list. No report-uri is set yet, so violations show only in the browser console.
+// Once a few weeks of browsing show no unexpected violations, the header can be renamed to Content-Security-Policy.
+//   logout.world        booking checkout: loader script, its modal iframe, widget styling fetch and logo images
+//   *.tawk.to + others  tawk.to live chat (script, styles, fonts, images, iframe, websocket), per tawk.to's CSP guidance
+//   google.com          Google Maps embed (iframe)
+//   youtube-nocookie    blog video embeds (iframe)
+//   va.vercel-scripts   Vercel Analytics, only loaded on Vercel
+// 'unsafe-inline' scripts: Next.js writes inline bootstrap scripts into every page, and nonces would need per-request
+// rendering. 'unsafe-eval' is added only in `next dev`, whose hot reloading uses eval; production never gets it
+function contentSecurityPolicy() {
+  const dev = process.env.NODE_ENV === 'development'
+  const directives = {
+    'default-src': ["'self'"],
+    'script-src': ["'self'", "'unsafe-inline'", ...(dev ? ["'unsafe-eval'"] : []), 'https://logout.world', 'https://embed.tawk.to', 'https://*.tawk.to', 'https://cdn.jsdelivr.net', 'https://va.vercel-scripts.com'],
+    'style-src': ["'self'", "'unsafe-inline'", 'https://*.tawk.to', 'https://fonts.googleapis.com'],
+    'img-src': ["'self'", 'data:', 'blob:', 'https://logout.world', 'https://*.tawk.to', 'https://cdn.jsdelivr.net', 'https://tawk.link', 'https://s3.amazonaws.com'],
+    'font-src': ["'self'", 'https://*.tawk.to', 'https://fonts.gstatic.com'],
+    'connect-src': ["'self'", 'https://logout.world', 'https://*.tawk.to', 'wss://*.tawk.to'],
+    'frame-src': ['https://logout.world', 'https://www.google.com', 'https://www.youtube-nocookie.com', 'https://*.tawk.to'],
+    'frame-ancestors': ["'self'"],
+    'form-action': ["'self'"],
+    'base-uri': ["'self'"],
+    'object-src': ["'none'"],
+  }
+  return Object.entries(directives).map(([name, sources]) => `${name} ${sources.join(' ')}`).join('; ')
+}
 
 // Preview and staging hosts must stay out of search results so they don't compete with the real domain.
 // *.vercel.app previews are matched by host; any other staging deployment sets SITE_NOINDEX=true
