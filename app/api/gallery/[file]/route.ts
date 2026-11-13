@@ -3,13 +3,12 @@ import { galleryFiles } from '@/data/gallery'
 
 // Gallery photos live in a private S3 bucket (gallery/ folder); this route reads them with server-side keys.
 // next/image fetches from here, then resizes and caches the result, so S3 is hit rarely
-const s3 = new S3Client({
-  region: process.env.S3_REGION || 'ap-south-1',
-  credentials: {
-    accessKeyId: process.env.S3_ACCESS_KEY_ID ?? '',
-    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY ?? '',
-  },
-})
+// With S3_ACCESS_KEY_ID / S3_SECRET_ACCESS_KEY set (Vercel, local) those keys are used; without them the AWS SDK's
+// default chain applies, so on AWS the App Runner / ECS task role grants read access and no key is stored anywhere
+const keys = process.env.S3_ACCESS_KEY_ID && process.env.S3_SECRET_ACCESS_KEY
+  ? { accessKeyId: process.env.S3_ACCESS_KEY_ID, secretAccessKey: process.env.S3_SECRET_ACCESS_KEY }
+  : undefined
+const s3 = new S3Client({ region: process.env.S3_REGION || 'ap-south-1', credentials: keys })
 
 const known = new Set(galleryFiles)
 

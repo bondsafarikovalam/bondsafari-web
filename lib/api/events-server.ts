@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { cache } from 'react'
-import { activitiesFrom, apiSlugOf, catalogueEvent, eventToExperience, type EventRecord, type EventsResponse } from '@/lib/api/events'
+import { activitiesFrom, apiSlugOf, catalogueEvent, eventToExperience, type EventRecord, type EventsResponse, type LivePages } from '@/lib/api/events'
 import { experiences } from '@/data/experiences'
 import { courses } from '@/data/courses'
 import { programmes } from '@/data/programmes'
@@ -15,18 +15,42 @@ export type Catalogue = keyof typeof apiKeys
 export const hasApiKey = (catalogue: Catalogue) => !!process.env[apiKeys[catalogue]]
 const headersOf = (catalogue: Catalogue) => ({ Accept: 'application/json', Authorization: `Bearer ${process.env[apiKeys[catalogue]]}` })
 
-export const fetchPage = (catalogue: Catalogue, page: number | string) => axios.get<EventsResponse>(listUrl(), { params: { page }, headers: headersOf(catalogue), timeout: 15000 }).then(r => r.data)
+const describe = (error: unknown) => axios.isAxiosError(error) ? error.response?.status ?? error.code : error
+
+// logout.world answers in seconds, so its responses are kept in this server's memory for a few minutes instead of being
+// fetched again for every page view. Requests that arrive together share one call; after the TTL the stale copy still
+// answers at once while a fresh one loads, and it stays in use if logout.world is down
+const TTL = 5 * 60 * 1000
+const kept = new Map<string, { at: number; value: unknown }>()
+const loading = new Map<string, Promise<unknown>>()
+function remember<T>(key: string, load: () => Promise<T>): Promise<T> {
+  const hit = kept.get(key)
+  if (hit && Date.now() - hit.at < TTL) return Promise.resolve(hit.value as T)
+  let next = loading.get(key) as Promise<T> | undefined
+  if (!next) {
+    next = load().then(value => { kept.set(key, { at: Date.now(), value }); return value }).finally(() => loading.delete(key))
+    loading.set(key, next)
+  }
+  if (!hit) return next
+  next.catch(error => console.error(`Events API: refreshing ${key} failed, still serving the copy from ${new Date(hit.at).toISOString()}`, describe(error)))
+  return Promise.resolve(hit.value as T)
+}
+
+export const fetchPage = (catalogue: Catalogue, page: number | string) => remember(`page:${catalogue}:${page}`, () => axios.get<EventsResponse>(listUrl(), { params: { page }, headers: headersOf(catalogue), timeout: 15000 }).then(r => r.data))
 
 // Every event in a catalogue, in full. The detail endpoint returns only a few fields, so the copy and images come from here
+const loadAll = async (catalogue: Catalogue) => {
+  const first = await fetchPage(catalogue, 1)
+  const rest = await Promise.all(Array.from({ length: Math.max(0, first.total_pages - 1) }, (_, i) => fetchPage(catalogue, i + 2)))
+  return [first, ...rest].flatMap(page => page.results)
+}
 async function listAll(catalogue: Catalogue): Promise<EventRecord[]> {
   if (!hasApiKey(catalogue)) return []
   try {
-    const first = await fetchPage(catalogue, 1)
-    const rest = await Promise.all(Array.from({ length: Math.max(0, first.total_pages - 1) }, (_, i) => fetchPage(catalogue, i + 2)))
-    return [first, ...rest].flatMap(page => page.results)
+    return await remember(`all:${catalogue}`, () => loadAll(catalogue))
   } catch (error) {
     // The pages fall back to the catalogue in data/, so a rejected key would otherwise go unnoticed
-    console.error(`Events API: could not load ${catalogue}`, axios.isAxiosError(error) ? error.response?.status ?? error.code : error)
+    console.error(`Events API: could not load ${catalogue}`, describe(error))
     return []
   }
 }
@@ -36,19 +60,23 @@ async function listAll(catalogue: Catalogue): Promise<EventRecord[]> {
 type CatalogEvent = { slug: string; offering_type?: string; bookable?: boolean }
 type CatalogPage = { events: CatalogEvent[]; pagination?: { next_page?: number | null } }
 const catalogUrl = `https://logout.world/checkout-api/v1/companies/${checkout.company}/widgets/${checkout.widget}/catalog/`
-const offeringTypes = cache(async () => {
+const loadCatalog = async () => {
   const types = new Map<string, string>()
   const unbookable = new Set<string>()
-  try {
-    for (let page: number | null = 1; page; ) {
-      const data: CatalogPage = (await axios.get<CatalogPage>(catalogUrl, { params: { page }, timeout: 15000 })).data
-      data.events.forEach((e: CatalogEvent) => { if (e.offering_type) types.set(e.slug, e.offering_type); if (e.bookable === false) unbookable.add(e.slug) })
-      page = data.pagination?.next_page ?? null
-    }
-  } catch (error) {
-    console.error('Checkout catalog: could not load offering types', axios.isAxiosError(error) ? error.response?.status ?? error.code : error)
+  for (let page: number | null = 1; page; ) {
+    const data: CatalogPage = (await axios.get<CatalogPage>(catalogUrl, { params: { page }, timeout: 15000 })).data
+    data.events.forEach((e: CatalogEvent) => { if (e.offering_type) types.set(e.slug, e.offering_type); if (e.bookable === false) unbookable.add(e.slug) })
+    page = data.pagination?.next_page ?? null
   }
   return Object.assign(types, { unbookable })
+}
+const offeringTypes = cache(async () => {
+  try {
+    return await remember('checkout-catalog', loadCatalog)
+  } catch (error) {
+    console.error('Checkout catalog: could not load offering types', describe(error))
+    return Object.assign(new Map<string, string>(), { unbookable: new Set<string>() })
+  }
 })
 const siteCourses = new Set([...courses, ...programmes].map(c => c.slug))
 const looksLikeCourse = (e: EventRecord) => siteCourses.has(siteSlugOf(e.slug)) || /\b(course|mermaid|freediv\w*|divemaster|instructor)\b/i.test(`${e.slug.replace(/-/g, ' ')} ${e.name}`)
@@ -85,9 +113,18 @@ export const listCourses = cache(async () => {
   return (await courseRecords()).map(e => toApiCourse(e, !unbookable.has(e.slug)))
 })
 
+// Which activity and course pages exist right now (see isLivePage); a list is null while the API returns nothing for it
+export const livePages = cache(async (): Promise<LivePages> => {
+  const [events, activities, courses] = await Promise.all([listEvents(), listActivities(), listCourses()])
+  return {
+    activities: events.length ? activities.map(a => `/activities/${a.slug}`) : null,
+    courses: courses.length ? courses.map(c => `/courses/${c.slug}`) : null,
+  }
+})
+
 // One event for its own page: the single-event endpoint has the current price and dates but none of the copy or images,
 // so it goes over the list's record. Its empty fields are skipped, and if the call fails the page still has the list's
-const fetchEvent = (catalogue: Catalogue, slug: string) => axios.get<EventRecord>(`https://logout.world/api/event/${encodeURIComponent(slug)}/`, { headers: headersOf(catalogue), timeout: 15000 }).then(r => r.data)
+const fetchEvent = (catalogue: Catalogue, slug: string) => remember(`event:${catalogue}:${slug}`, () => axios.get<EventRecord>(`https://logout.world/api/event/${encodeURIComponent(slug)}/`, { headers: headersOf(catalogue), timeout: 15000 }).then(r => r.data))
 export const getEventRecord = cache(async (catalogue: Catalogue, slug: string): Promise<EventRecord | undefined> => {
   if (!hasApiKey(catalogue)) return undefined
   const [listed, single] = await Promise.all([

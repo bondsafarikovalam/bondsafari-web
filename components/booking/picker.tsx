@@ -22,8 +22,9 @@ export function Picker({ label, name, groups, defaultValue = '', placeholder = '
   const [place, setPlace] = useState({ up: false, max: 320 })
   const current = options.find(o => o.value === value)
 
-  // A new preset (e.g. the booking popup reopening on another page) resets the choice
-  useEffect(() => { setValue(defaultValue) }, [defaultValue])
+  // A new preset (e.g. the booking popup reopening on another page) resets the choice, during render rather than after it
+  const [preset, setPreset] = useState(defaultValue)
+  if (preset !== defaultValue) { setPreset(defaultValue); setValue(defaultValue) }
   useEffect(() => {
     if (!open) return
     const away = (e: PointerEvent) => { if (!box.current?.contains(e.target as Node)) setOpen(false) }
@@ -62,7 +63,7 @@ export function Picker({ label, name, groups, defaultValue = '', placeholder = '
 
   return <div ref={box} className={`ct-select${open ? ' is-open' : ''} ${className}`}>
     <span id={`${id}-label`}>{label}</span>
-    <button type="button" className={current ? '' : 'is-empty'} aria-haspopup="listbox" aria-expanded={open} aria-labelledby={`${id}-label ${id}-btn`} id={`${id}-btn`} aria-controls={`${id}-list`} aria-activedescendant={open ? `${id}-${active}` : undefined} onClick={() => open ? setOpen(false) : show()} onKeyDown={onKey}>
+    <button type="button" role="combobox" className={current ? '' : 'is-empty'} aria-haspopup="listbox" aria-expanded={open} aria-labelledby={`${id}-label ${id}-btn`} id={`${id}-btn`} aria-controls={`${id}-list`} aria-activedescendant={open ? `${id}-${active}` : undefined} onClick={() => open ? setOpen(false) : show()} onKeyDown={onKey}>
       <span>{current ? current.label ?? current.value : placeholder}</span><ChevronDown />
     </button>
     <input type="hidden" name={name} value={value} />

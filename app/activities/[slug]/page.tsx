@@ -4,10 +4,11 @@ import { experiences } from '@/data/experiences'
 import { courseNext, homeCategoryOf, levelOf, listingOf, sectionOf, statusOf } from '@/data/programmes'
 import { Detail, type RelatedItem } from '@/components/pages/detail'
 import { JsonLd, breadcrumbLd, offeringLd, pageMeta } from '@/lib/seo'
-import { getEvent, getEventRecord, isCourseEvent, listActivities, listEvents } from '@/lib/api/events-server'
-import { apiSlugOf, brochureOf, coverIn } from '@/lib/api/events'
+import { getEvent, getEventRecord, isCourseEvent, listActivities, listEvents, livePages } from '@/lib/api/events-server'
+import { apiSlugOf, brochureOf, coverIn, isLivePage } from '@/lib/api/events'
 
-export const dynamic = 'force-dynamic'
+// Rebuilt at most every 5 minutes, like the Activities and Courses pages; an activity the API adds later renders on first visit
+export const revalidate = 300
 export const generateStaticParams = () => experiences.map(e => ({ slug: e.slug }))
 
 // An activity the API lists but hasn't published (or has dropped) still opens from old links, but stays out of search.
@@ -32,6 +33,9 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const staticExperience = experiences.find(x => x.slug === slug)
   // A course from Bond Safari's events list belongs on its Courses page
   if (!staticExperience && await isCourseEvent(slug)) permanentRedirect(`/courses/${siteSlugOf(slug)}`)
+  // Only activities the API publishes have a page; an old link to any other lands on the Activities list.
+  // When the API can't be reached at all, the site's own activities stand in instead
+  if (await isUnpublished(slug)) permanentRedirect('/activities')
   const e = (await getEvent(slug)) ?? staticExperience
   if (!e) notFound()
   const cat = homeCategoryOf(slug)
@@ -45,7 +49,10 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const fromApi: RelatedItem[] = (await listActivities()).filter(a => a.slug !== slug).map(a => ({ title: a.title, category: `Activity · ${a.difficulty ?? a.category}`, image: a.image, price: a.price, duration: a.duration, tagline: a.tagline, href: `/activities/${a.slug}` }))
   const related = fromApi.length ? fromApi : fromCatalogue
   const listing = listingOf(slug) ?? { location: e.location ?? 'Kovalam', level: e.category }
-  const next = courseNext[slug] ? listingOf(courseNext[slug]) : undefined
+  // The next step (a course) only links to a page that exists
+  const pages = await livePages()
+  const nextListing = courseNext[slug] ? listingOf(courseNext[slug]) : undefined
+  const next = nextListing && isLivePage(pages, nextListing.href) ? nextListing : undefined
   // The published event's brochure from logout.world; without one the page makes its own PDF
   const record = await getEventRecord('activities', apiSlugOf(slug))
   const brochure = record && record.publish !== false ? brochureOf(record.slug) : undefined

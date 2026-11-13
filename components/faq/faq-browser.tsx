@@ -8,9 +8,8 @@ import { FaqItem } from '@/components/faq/faq-item'
 const normalise = (s: string) => s.toLowerCase().normalize('NFKD').replace(/[‘’]/g, "'").replace(/\s+/g, ' ')
 
 // Category tabs, search across every category and the accordions. Every panel is in the server HTML;
-// the tabs only hide the other two
-export function FaqBrowser({ groups }: { groups: FaqGroup[] }) {
-  const [active, setActive] = useState(groups[0].id)
+// the tabs only hide the other two. The chosen category is held by FaqView, which also swaps the hero photo
+export function FaqBrowser({ groups, active, onActive: setActive }: { groups: FaqGroup[]; active: string; onActive: (id: string) => void }) {
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState<Set<string>>(new Set())
 
@@ -20,7 +19,7 @@ export function FaqBrowser({ groups }: { groups: FaqGroup[] }) {
     pick()
     window.addEventListener('hashchange', pick)
     return () => window.removeEventListener('hashchange', pick)
-  }, [groups])
+  }, [groups, setActive])
 
   const index = useMemo(() => groups.map(g => g.faqs.map(f => normalise(`${f.q}\n${answerText(f.a)}`))), [groups])
   const terms = normalise(query.trim()).split(' ').filter(Boolean)

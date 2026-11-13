@@ -3,10 +3,13 @@ import { notFound } from 'next/navigation'
 import { landingPages } from '@/data/landing'
 import { LandingPage } from '@/components/pages/landing'
 import { JsonLd, breadcrumbLd, pageMeta } from '@/lib/seo'
+import { livePages } from '@/lib/api/events-server'
 
 // Search landing pages (/scuba-diving-in-kerala, /things-to-do-in-kovalam, …). Only the slugs listed in
 // data/landing.ts exist; anything else at this level is a 404.
 export const dynamicParams = false
+// Rebuilt every 5 minutes, so the activities and courses it lists follow the API
+export const revalidate = 300
 export const generateStaticParams = () => landingPages.map(l => ({ landing: l.slug }))
 
 export async function generateMetadata({ params }: { params: Promise<{ landing: string }> }): Promise<Metadata> {
@@ -20,5 +23,5 @@ export default async function Page({ params }: { params: Promise<{ landing: stri
   const { landing } = await params
   const page = landingPages.find(l => l.slug === landing)
   if (!page) notFound()
-  return <><JsonLd data={breadcrumbLd([['Home', '/'], [page.eyebrow, `/${page.slug}`]])} /><LandingPage page={page} /></>
+  return <><JsonLd data={breadcrumbLd([['Home', '/'], [page.eyebrow, `/${page.slug}`]])} /><LandingPage page={page} live={await livePages()} /></>
 }

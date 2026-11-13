@@ -10,8 +10,9 @@ import { useEffect, useState } from 'react'
 export function PageLoader() {
   const pathname = usePathname()
   const [loading, setLoading] = useState(false)
-  // The new page has rendered
-  useEffect(() => setLoading(false), [pathname])
+  // The new page has rendered: hide it as soon as the path changes, during render rather than after it
+  const [shownFor, setShownFor] = useState(pathname)
+  if (shownFor !== pathname) { setShownFor(pathname); setLoading(false) }
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return

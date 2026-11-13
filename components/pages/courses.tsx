@@ -74,7 +74,6 @@ export function Courses({ live = [] }: { live?: ApiCourse[] }) {
   const heroY = useTransform(scrollYProgress, [0, 1], ['0%', reduce ? '0%' : '25%'])
   const heroFade = useTransform(scrollYProgress, [0, 0.7], [1, 0])
   const [barShown, setBarShown] = useState(false)
-  useEffect(() => { console.log('Courses API:', live.length, live) }, [live])
   // Which category's courses are showing; a link like /courses#freediving opens that one
   const [chosen, setChosen] = useState<string>(sections[0].slug)
   const current = sections.find(g => g.slug === chosen) ?? sections[0]

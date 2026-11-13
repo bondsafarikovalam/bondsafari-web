@@ -4,8 +4,8 @@ import Image from '@/components/ui/photo'
 import Link from 'next/link'
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion'
 import { ArrowRight, Clock, MapPin, Sparkles } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { activityGroups, experiences, groupOf, type Experience } from '@/data/experiences'
+import { useEffect, useState, useSyncExternalStore } from 'react'
+import { activityGroups, groupOf, type Experience } from '@/data/experiences'
 import { listingOf, statusOf } from '@/data/programmes'
 import { timesFor } from '@/lib/booking/cart'
 import { Cta } from '@/components/booking/book'
@@ -29,6 +29,7 @@ const amount = (e: Experience) => Number(e.price?.replace(/[^\d]/g, '') || 0)
 const istMinutes = () => { const p = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date()); return +p.find(x => x.type === 'hour')!.value * 60 + +p.find(x => x.type === 'minute')!.value }
 const minutesOf = (t: string) => { const [, h, mm, ap] = t.match(/(\d+):(\d+) (AM|PM)/)!; return (+h % 12 + (ap === 'PM' ? 12 : 0)) * 60 + +mm }
 // Half an hour's notice before a departure counts as still bookable today
+const everyMinute = (tick: () => void) => { const t = setInterval(tick, 60_000); return () => clearInterval(t) }
 const nextDeparture = (slug: string, now: number) => {
   const times = timesFor(slug).map(t => t.id).filter(t => /^\d+:\d\d [AP]M$/.test(t))
   if (!times.length) return undefined
@@ -68,7 +69,7 @@ export function ExperienceStack({ initial = [] }: { initial?: Experience[] }) {
   const loaded = useEventsStore(s => s.loaded)
   const activities = loaded || !initial.length ? stored : initial
   const fetchEvents = useEventsStore(s => s.fetchEvents)
-  useEffect(() => { void fetchEvents() }, [fetchEvents])
+  useEffect(() => { if (!initial.length) void fetchEvents() }, [fetchEvents, initial.length])
   const [tab, setTab] = useState<Tab>('All')
   const list = [...activities].sort((a, b) => rank(a) - rank(b))
   const homeList = list.slice(0, 10)
@@ -76,8 +77,7 @@ export function ExperienceStack({ initial = [] }: { initial?: Experience[] }) {
   const shown = tab === 'All' ? homeList : list.filter(e => groupOf(e) === tab).slice(0, 10)
   const fromPrice = Math.min(...activities.map(amount).filter(Boolean)).toLocaleString('en-IN')
   // Kovalam time, read in the browser (so the server render never disagrees) and refreshed every minute
-  const [now, setNow] = useState<number>()
-  useEffect(() => { setNow(istMinutes()); const t = setInterval(() => setNow(istMinutes()), 60_000); return () => clearInterval(t) }, [])
+  const now = useSyncExternalStore(everyMinute, istMinutes, () => undefined)
 
   return <section className="hs tg" aria-labelledby="hs-title">
     <m.div className="hs-head" initial="hidden" whileInView="show" viewport={{ once: true }}>

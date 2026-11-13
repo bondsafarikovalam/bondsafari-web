@@ -8,12 +8,14 @@ import { bySlug, hrefOf, type Product } from '@/data/products'
 import type { Landing } from '@/data/landing'
 import { enquiryMessage, isBookable, statusOf } from '@/data/programmes'
 import { whatsappLink } from '@/data/site'
+import { isLivePage, type LivePages } from '@/lib/api/events'
 import { PageIntro } from '@/components/pages/pages'
 import { Reveal } from '@/components/layout/header'
 
 
-export function LandingPage({ page }: { page: Landing }) {
-  const items = page.products.map(bySlug).filter((p): p is Product => !!p)
+export function LandingPage({ page, live }: { page: Landing; live?: LivePages }) {
+  // Only activities and courses whose page the API publishes
+  const items = page.products.map(bySlug).filter((p): p is Product => !!p && isLivePage(live, hrefOf(p)))
   return <main className="landing">
     <PageIntro eyebrow={page.eyebrow} title={<>{page.heading[0]}<br /><i>{page.heading[1]}</i></>} copy={page.description} image={page.image} />
     <section className="section landing-body">

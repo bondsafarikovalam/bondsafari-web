@@ -4,7 +4,6 @@ export const contact = {
   address: ['Suseela Tower, Beach Road', 'VRP XIX/553-A, Kovalam P.O.', 'Kovalam, Kerala 695527'],
   hours: 'Monday – Sunday · 8:30 AM – 6:30 PM',
   mapUrl: 'https://www.google.com/maps/search/?api=1&query=Bond+Safari+Kovalam+Suseela+Tower+Beach+Road',
-  bookingUrl: 'http://bookings.bondsafarikovalam.com/',
   whatsapp: '918448448846',
 }
 

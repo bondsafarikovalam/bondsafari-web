@@ -150,3 +150,12 @@ export const activitiesFrom = (events: EventRecord[]) => {
   const extra = published.filter(x => !taken.has(x.slug)).map(x => ({ ...eventToExperience(x), category: categoryOfName(x.name) }))
   return [...fromCatalogue, ...extra]
 }
+
+// The /activities/* and /courses/* pages that exist: the API's published ones. A list is null while the API returned
+// nothing for it, and then every link stays (the site's own pages stand in, as the detail pages do)
+export type LivePages = { activities: string[] | null; courses: string[] | null }
+export const isLivePage = (live: LivePages | undefined, href: string) => {
+  const path = href.split(/[?#]/)[0]
+  const list = path.startsWith('/activities/') ? live?.activities : path.startsWith('/courses/') ? live?.courses : undefined
+  return !list || list.includes(path)
+}
