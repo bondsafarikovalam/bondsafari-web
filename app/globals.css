@@ -285,6 +285,8 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}html::-webkit-scrollbar,b
 /* Footer: the real logo in place of the "BS" monogram */
 .footer-logo{display:inline-block}.footer-logo img{display:block;height:64px;width:auto;filter:drop-shadow(0 2px 10px rgba(0,0,0,.35))}.footer-place{margin:10px 0 0;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--sand)}
 @media(max-width:800px){.footer-logo img{height:54px}}
+.footer-logo{display:inline-flex;align-items:center;gap:14px}.footer-logo .padi-badge img{height:44px;filter:none}
+@media(max-width:800px){.footer-logo{gap:10px}.footer-logo .padi-badge{padding:4px 6px;border-radius:9px}.footer-logo .padi-badge img{height:36px}}
 /* Booking: multi-activity cart (activity cards with their own people count, per-activity times, summary) */
 .bk-context{padding:12px 16px}.bk-context small{display:inline-flex;align-items:center;gap:6px}.bk-context small svg{width:13px;height:13px}
 .bk-sub{margin:-8px 0 18px;font-size:14px;line-height:1.55;color:#647071}.bk-pre{display:inline-flex;align-items:center;gap:8px;margin:-6px 0 16px;padding:8px 14px;border-radius:100px;background:white;border:1px solid var(--line);font-size:13px;color:var(--ocean)}.bk-pre svg{width:14px;height:14px;color:var(--teal)}
@@ -705,3 +707,74 @@ img.photo-loading{background-color:rgba(127,140,141,.18);background-image:linear
 /* FAQ hero: the selected category's photo fades in over the others */
 .fq-hero-photo{position:absolute;inset:0;opacity:0;transition:opacity .7s ease}.fq-hero-photo.is-on{opacity:1}.fq-hero-photo img{object-fit:cover}
 @media(prefers-reduced-motion:reduce){.fq-hero-photo{transition:none}}
+/* PADI logo beside the Bond Safari logo: a white badge, since its "PADI" lettering is black */
+.padi-badge{display:grid;place-items:center;flex:none;background:#fff;border-radius:12px;padding:6px 8px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+.brand-logo{display:flex;align-items:center;gap:14px}.brand-logo .padi-badge img{height:48px;filter:none}
+.site-header.is-scrolled .brand-logo .padi-badge img{height:34px}
+@media(max-width:800px){.brand-logo{gap:10px}.brand-logo .padi-badge{padding:4px 6px;border-radius:9px}.brand-logo .padi-badge img{height:36px}.site-header.is-scrolled .brand-logo .padi-badge img{height:28px}}
+/* Home hero: the real logo in place of the "BS" monogram */
+.hero-mark{width:auto;height:auto;border:0;border-radius:0}.hero-mark img{display:block;height:120px;width:auto;filter:drop-shadow(0 4px 18px rgba(0,0,0,.4))}
+@media(max-width:800px){.hero-mark{width:auto;height:auto}.hero-mark img{height:88px}}
+/* Mobile menu open: lock the page behind it, and keep scrolling inside the menu from reaching the page */
+@media(max-width:800px){html.menu-open,html.menu-open body{overflow:hidden;overscroll-behavior:none}.mobile-nav{max-height:calc(100svh - 95px);overflow-y:auto;overscroll-behavior:contain}}
+/* Related cards: the category line always stays on one line (running under the arrow's column), so every title starts at the same height */
+.dt-related-info span{display:block;margin-right:-56px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.16em}.dt-related-info i{top:34px}
+/* Related cards' Book buttons: all the height of a two-line label, so a long activity name doesn't make one stand out */
+.dt-related-book{min-height:calc(2.8em + 26px);line-height:1.4}
+/* PADI logo without the white badge: the white-lettered version sits straight on the dark header and footer */
+.padi-badge{background:none;padding:0;border-radius:0;box-shadow:none}.padi-badge img{filter:drop-shadow(0 2px 10px rgba(0,0,0,.35))!important}
+.brand-logo .padi-badge img{height:56px}.site-header.is-scrolled .brand-logo .padi-badge img{height:40px}.footer-logo .padi-badge img{height:52px}
+@media(max-width:800px){.brand-logo .padi-badge{padding:0}.brand-logo .padi-badge img{height:42px}.site-header.is-scrolled .brand-logo .padi-badge img{height:32px}.footer-logo .padi-badge{padding:0}.footer-logo .padi-badge img{height:42px}}
+/* Gallery: tiles open a full-screen viewer (components/gallery-wall.tsx) */
+button.gallery-card{display:block;width:100%;padding:0;border:0;cursor:zoom-in;font:inherit}button.gallery-card:focus-visible{outline:2px solid var(--teal);outline-offset:3px}
+html.lightbox-open,html.lightbox-open body{overflow:hidden}
+.lightbox{position:fixed;inset:0;z-index:1000;background:rgba(3,24,31,.94);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);touch-action:pan-y;animation:lb-in .3s ease}
+.lightbox-photo{position:absolute;inset:64px 80px}.lightbox-photo img{object-fit:contain;animation:lb-photo .45s cubic-bezier(.19,1,.22,1)}
+.lightbox-count{position:absolute;top:22px;left:24px;color:rgba(255,255,255,.8);font:14px Georgia,serif;letter-spacing:.1em}
+.lightbox-btn{position:absolute;display:grid;place-items:center;width:52px;height:52px;border-radius:50%;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.08);color:white;cursor:pointer;transition:background .3s,border-color .3s}.lightbox-btn:hover{background:rgba(255,255,255,.2);border-color:white}.lightbox-btn svg{width:22px;height:22px}
+.lightbox-close{top:12px;right:16px}.lightbox-prev{left:16px;top:50%;margin-top:-26px}.lightbox-next{right:16px;top:50%;margin-top:-26px}
+@keyframes lb-in{from{opacity:0}}@keyframes lb-photo{from{opacity:0;transform:scale(.96)}}
+@media(max-width:800px){.lightbox-photo{inset:64px 0 84px}.lightbox-prev,.lightbox-next{top:auto;bottom:18px;margin:0;width:48px;height:48px}.lightbox-prev{left:calc(50% - 64px)}.lightbox-next{right:calc(50% - 64px)}}
+@media(prefers-reduced-motion:reduce){.lightbox,.lightbox-photo img{animation:none}}
+/* Gallery: ring + dot cursor that follows the mouse (components/gallery-wall.tsx); the normal cursor stays as well */
+button.gallery-card{cursor:pointer}
+.ring-cursor{position:fixed;top:0;left:0;z-index:9999;pointer-events:none;opacity:0;transition:opacity .3s}.ring-cursor.is-visible{opacity:1}
+.ring-cursor>span{display:block;width:38px;height:38px;margin:-19px 0 0 -19px;border:1px solid var(--teal);border-radius:50%;transition:transform .35s cubic-bezier(.19,1,.22,1),background-color .35s,border-color .35s}
+.ring-cursor.is-hover>span{background:rgba(18,107,112,.08);border-color:rgba(18,107,112,.4);transform:scale(1.7)}
+.ring-cursor.is-light>span{border-color:rgba(255,255,255,.85)}.ring-cursor.is-light.is-hover>span{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.6)}
+.ring-cursor.is-active>span{transform:scale(.8)}
+.ring-cursor-dot>span{width:6px;height:6px;margin:-3px 0 0 -3px;border:0;background:var(--teal)}.ring-cursor-dot.is-light>span{background:white}
+@media(hover:none),(pointer:coarse){.ring-cursor{display:none}}
+/* Gallery hero (components/gallery-hero.tsx): title on the left, three drifting columns of gallery photos on the right */
+.gh{position:relative;display:flex;align-items:center;min-height:max(640px,92vh);padding:140px 8vw 80px;overflow:hidden;color:white;background:radial-gradient(120% 90% at 0% 100%,#0e4a57,transparent 60%),var(--ocean)}
+.gh-wall{position:absolute;top:-12%;bottom:-12%;right:4vw;width:min(50vw,760px);display:grid;grid-template-columns:repeat(3,1fr);gap:18px;transform:rotate(-7deg);-webkit-mask-image:linear-gradient(transparent,#000 18%,#000 82%,transparent);mask-image:linear-gradient(transparent,#000 18%,#000 82%,transparent);animation:in-fade 1.6s ease .2s both}
+.gh-col{overflow:hidden}.gh-col:nth-child(2){margin-top:-40%}
+.gh-col-track{display:flex;flex-direction:column;gap:18px;animation:gh-up var(--gh-t,50s) linear infinite}.gh-col:nth-child(2) .gh-col-track{animation-name:gh-down}
+.gh-photo{position:relative;flex:none;aspect-ratio:3/4;border-radius:18px;overflow:hidden;background:#0e3b48;box-shadow:0 20px 40px -18px rgba(0,0,0,.6)}.gh-photo:nth-child(3n+2){aspect-ratio:4/5}.gh-photo img{object-fit:cover}
+@keyframes gh-up{to{transform:translateY(calc(-50% - 9px))}}@keyframes gh-down{from{transform:translateY(calc(-50% - 9px))}to{transform:none}}
+.gh-shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,var(--ocean) 30%,rgba(8,45,58,.6) 52%,transparent 75%)}
+.gh-content{position:relative;z-index:1;max-width:620px}
+.gh h1{font:400 clamp(56px,7.4vw,118px)/.95 Georgia,serif;letter-spacing:-.045em;margin:0 0 28px}.gh h1 i{color:var(--sand)}
+.gh-copy{max-width:440px;margin:0 0 44px;font-size:17px;line-height:1.6;color:rgba(255,255,255,.78)}
+.gh-foot{display:flex;align-items:center;gap:36px;padding-top:26px;border-top:1px solid rgba(255,255,255,.2)}
+.gh-count{display:flex;align-items:baseline;gap:10px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.7)}.gh-count b{font:400 40px/1 Georgia,serif;letter-spacing:-.02em;color:white}
+.gh-scroll{display:inline-flex;align-items:center;gap:10px;font-size:11px;letter-spacing:.2em;text-transform:uppercase}.gh-scroll svg{width:15px;height:15px;animation:gh-nudge 1.8s ease-in-out infinite}.gh-scroll:hover{color:var(--sand)}
+@keyframes gh-nudge{50%{transform:translateY(4px)}}
+.gallery-section{scroll-margin-top:80px}
+@media(max-width:800px){.gh{align-items:end;min-height:100svh;padding:120px 22px 48px}.gh-wall{inset:-8% -30% auto -10%;width:auto;height:75%;gap:10px;opacity:.75}.gh-col-track{gap:10px}.gh-photo{border-radius:12px}@keyframes gh-up{to{transform:translateY(calc(-50% - 5px))}}@keyframes gh-down{from{transform:translateY(calc(-50% - 5px))}to{transform:none}}.gh-shade{background:linear-gradient(0deg,var(--ocean) 34%,rgba(8,45,58,.55) 62%,rgba(8,45,58,.25))}.gh h1{font-size:16vw;margin-bottom:20px}.gh-copy{font-size:15px;margin-bottom:30px}.gh-foot{gap:24px;flex-wrap:wrap}.gh-count b{font-size:32px}}
+@media(prefers-reduced-motion:reduce){.gh-col-track,.gh-scroll svg{animation:none}}
+.is-scrolling .gh-scroll svg{animation-play-state:paused}
+/* Blog hero (components/pages/blog.tsx BlogHero): simple, centred, on the ocean colour */
+.bh{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:max(520px,70vh);padding:150px 8vw 90px;text-align:center;color:white;background:radial-gradient(80% 70% at 50% 0%,rgba(18,107,112,.45),transparent 70%),var(--ocean)}
+.bh .eyebrow{margin-bottom:22px}
+.bh h1{margin:0 0 24px;font:400 clamp(50px,7vw,108px)/.98 Georgia,serif;letter-spacing:-.045em}.bh h1 i{color:var(--sand)}
+.bh-text{max-width:460px;margin:0 0 40px;font-size:17px;line-height:1.6;color:rgba(255,255,255,.72)}
+.bh-scroll{display:inline-flex;align-items:center;gap:10px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.4);transition:color .3s,border-color .3s}.bh-scroll svg{width:15px;height:15px;animation:gh-nudge 1.8s ease-in-out infinite}.bh-scroll:hover{color:var(--sand);border-color:var(--sand)}
+/* Blog hero photo: slow zoom-out, under an ocean-tinted shade so the centred text stays readable */
+.bh{position:relative;overflow:hidden;isolation:isolate}.bh-media{position:absolute;inset:0;z-index:-2;animation:bh-zoom 14s ease-out both}.bh-media img{object-fit:cover}@keyframes bh-zoom{from{transform:scale(1.1)}}
+.bh:before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(70% 70% at 50% 50%,rgba(8,45,58,.55),rgba(8,45,58,.8)),linear-gradient(0deg,rgba(3,24,31,.6),transparent 40%)}
+@media(prefers-reduced-motion:reduce){.bh-media{animation:none}}
+#stories{scroll-margin-top:70px}
+@media(max-width:800px){.bh{min-height:max(460px,64svh);padding:130px 22px 64px}.bh h1{font-size:13vw}.bh-text{font-size:15px;margin-bottom:32px}}
+@media(prefers-reduced-motion:reduce){.bh-scroll svg{animation:none}}
+.is-scrolling .bh-scroll svg{animation-play-state:paused}

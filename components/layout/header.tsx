@@ -43,12 +43,26 @@ export function Header() {
     return () => { clearTimeout(timer); window.removeEventListener('scroll', onScroll) }
   }, [])
   const hidden = moving && !open
+  // While the mobile menu is open the page behind it stays put (the lock itself is in CSS, mobile widths only)
+  useEffect(() => {
+    document.documentElement.classList.toggle('menu-open', open)
+    return () => document.documentElement.classList.remove('menu-open')
+  }, [open])
+  // A tap anywhere outside the header (and its menu) closes the menu; so does Escape
+  useEffect(() => {
+    if (!open) return
+    const onDown = (e: PointerEvent) => { if (!box.current?.contains(e.target as Node)) setOpen(false) }
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
+    document.addEventListener('pointerdown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => { document.removeEventListener('pointerdown', onDown); document.removeEventListener('keydown', onKey) }
+  }, [open])
   // Lets other sticky bars (e.g. the experiences filter) slide up into the space while it's away
   useEffect(() => {
     document.documentElement.toggleAttribute('data-header-hidden', hidden)
     return () => document.documentElement.removeAttribute('data-header-hidden')
   }, [hidden])
-  return <header ref={box} className={`site-header${scrolled || open ? ' is-scrolled' : ''}${hidden ? ' is-hidden' : ''}`}><Link className="brand brand-logo" href="/" aria-label="Bond Safari home"><Image src="/images/logo.webp" alt="Bond Safari" width={447} height={320} sizes="101px" priority /></Link><nav className="desktop-nav" aria-label="Main">{nav.map(([label, href]) => <Link key={href} href={href} className={isActive(path, href) ? 'is-active' : undefined} aria-current={isActive(path, href) ? 'page' : undefined}>{label}</Link>)}</nav><div className="header-actions"><BookLink className="pill pill-light" href="/activities">Book now <ArrowRight /></BookLink><button className="menu-button" onClick={() => setOpen(!open)} aria-label={open ? 'Close menu' : 'Open menu'}>{open ? <X /> : <Menu />}</button></div><AnimatePresence>{open && <m.nav className="mobile-nav" initial={{opacity:0,y:-10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}}>{nav.map(([label, href]) => <Link onClick={() => setOpen(false)} key={href} href={href} className={isActive(path, href) ? 'is-active' : undefined} aria-current={isActive(path, href) ? 'page' : undefined}>{label}<ArrowRight /></Link>)}<BookLink className="pill pill-dark" href="/activities" onClick={() => setOpen(false)}>Book your adventure <ArrowRight /></BookLink></m.nav>}</AnimatePresence></header>
+  return <header ref={box} className={`site-header${scrolled || open ? ' is-scrolled' : ''}${hidden ? ' is-hidden' : ''}`}><Link className="brand brand-logo" href="/" aria-label="Bond Safari home"><Image src="/images/logo.webp" alt="Bond Safari" width={447} height={320} sizes="101px" priority /><span className="padi-badge"><Image src="/images/padi-light.webp" alt="PADI" width={243} height={320} sizes="40px" priority /></span></Link><nav className="desktop-nav" aria-label="Main">{nav.map(([label, href]) => <Link key={href} href={href} className={isActive(path, href) ? 'is-active' : undefined} aria-current={isActive(path, href) ? 'page' : undefined}>{label}</Link>)}</nav><div className="header-actions"><BookLink className="pill pill-light" href="/activities">Book now <ArrowRight /></BookLink><button className="menu-button" onClick={() => setOpen(!open)} aria-label={open ? 'Close menu' : 'Open menu'}>{open ? <X /> : <Menu />}</button></div><AnimatePresence>{open && <m.nav className="mobile-nav" initial={{opacity:0,y:-10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}}>{nav.map(([label, href]) => <Link onClick={() => setOpen(false)} key={href} href={href} className={isActive(path, href) ? 'is-active' : undefined} aria-current={isActive(path, href) ? 'page' : undefined}>{label}<ArrowRight /></Link>)}<BookLink className="pill pill-dark" href="/activities" onClick={() => setOpen(false)}>Book your adventure <ArrowRight /></BookLink></m.nav>}</AnimatePresence></header>
 }
 
 export function Reveal({ children, className = '' }: { children: React.ReactNode; className?: string }) { return <m.div className={className} initial={{opacity:0,y:28}} whileInView={{opacity:1,y:0}} viewport={{once:true, margin:'-80px'}} transition={{duration:.7, ease:[.22,1,.36,1]}}>{children}</m.div> }

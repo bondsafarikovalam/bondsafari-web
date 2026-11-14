@@ -11,7 +11,7 @@ const tel = (n: string) => `tel:${n.replace(/\s/g, '')}`
 export function Footer() {
   return <footer className="footer">
     <div className="footer-brand">
-      <Link className="footer-logo" href="/" aria-label="Bond Safari home"><Image src="/images/logo.webp" alt="Bond Safari Kovalam" width={447} height={320} sizes="90px" /></Link>
+      <Link className="footer-logo" href="/" aria-label="Bond Safari home"><Image src="/images/logo.webp" alt="Bond Safari Kovalam" width={447} height={320} sizes="90px" /><span className="padi-badge"><Image src="/images/padi-light.webp" alt="PADI" width={243} height={320} sizes="40px" /></span></Link>
       <p className="footer-place">Kovalam · Kerala</p>
       <p className="footer-tagline">Enjoy the sea life with Bond Safari and feel the marvels hidden beneath.</p>
       <p className="footer-hours"><Clock />Open every day · {contact.hours.split('·').pop()?.trim()}</p>
