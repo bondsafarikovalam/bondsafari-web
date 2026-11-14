@@ -6,7 +6,7 @@ import { ArrowDown, ArrowRight, Clock, Mail, MapPin, Phone } from 'lucide-react'
 import { useRef, type FormEvent } from 'react'
 import { experiences } from '@/data/experiences'
 import { courses } from '@/data/courses'
-import { contact, socials } from '@/data/site'
+import { contact, socials, whatsappLink } from '@/data/site'
 import { Header } from '@/components/layout/header'
 import { SocialIcon } from '@/components/layout/social-icons'
 import { MapSection } from '@/components/sections/map'
@@ -36,13 +36,24 @@ export function Contact() {
   const heroY = useTransform(scrollYProgress, [0, 1], ['0%', reduce ? '0%' : '25%'])
   const heroFade = useTransform(scrollYProgress, [0, 0.7], [1, 0])
 
-  // No backend yet: the enquiry opens in the visitor's mail app, already filled in
+  // No backend: the enquiry opens in WhatsApp, already filled in and addressed to Bond Safari's number, so the
+  // visitor only has to press send. Optional fields left empty are left out of the message
   const submit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const f = new FormData(e.currentTarget)
     const get = (k: string) => String(f.get(k) ?? '').trim()
-    const body = [`Name: ${get('name')}`, `Email: ${get('email')}`, `Phone: ${get('phone')}`, `Interested in: ${get('topic')}`, '', get('message')].join('\n')
-    window.location.href = `mailto:${contact.email}?subject=${encodeURIComponent(`Enquiry from ${get('name')}`)}&body=${encodeURIComponent(body)}`
+    const lines = [
+      'Hello Bond Safari! I have an enquiry from your website.',
+      '',
+      `*Name:* ${get('name')}`,
+      get('phone') ? `*Phone:* ${get('phone')}` : null,
+      `*Email:* ${get('email')}`,
+      get('topic') ? `*Interested in:* ${get('topic')}` : null,
+      get('message') ? `\n*Message:*\n${get('message')}` : null,
+    ].filter(l => l !== null)
+    const url = whatsappLink(lines.join('\n'))
+    // A new tab on desktop (WhatsApp Web); if a pop-up blocker stops it, WhatsApp opens in this tab instead
+    if (!window.open(url, '_blank', 'noopener')) window.location.href = url
   }
 
   return <main className="ct">
@@ -90,7 +101,7 @@ export function Contact() {
           <Picker className="ct-wide" label="Interested in" name="topic" groups={groups} placeholder="Choose an activity" />
           <label className="ct-wide">Your message<textarea name="message" rows={5} placeholder="Tell us a little about your plans" /></label>
         </div>
-        <button type="submit" className="book-cta"><span className="book-cta-label"><strong>Submit now</strong><small>We reply within a day</small></span><span className="book-cta-icon"><ArrowRight /></span></button>
+        <button type="submit" className="book-cta"><span className="book-cta-label"><strong>Submit now</strong><small>Sends your details on WhatsApp</small></span><span className="book-cta-icon"><ArrowRight /></span></button>
       </m.form>
     </section>
 

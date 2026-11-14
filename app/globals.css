@@ -807,3 +807,5 @@ button.gallery-card{cursor:pointer}
 .lg-business{margin-top:26px;padding:22px 24px;border-radius:18px;background:white;border:1px solid var(--line)}.lg-business dl{display:grid;grid-template-columns:1fr 1fr;gap:14px 24px;margin:12px 0 14px}.lg-business dt{font-size:12px;color:#647071}.lg-business dd{margin:2px 0 0;color:var(--ocean)}
 @media(max-width:1000px){.lg-wrap{grid-template-columns:minmax(0,1fr);gap:30px}.lg-toc{position:static}}
 @media(max-width:800px){.lg-hero{padding:130px 20px 50px}.lg-hero h1{font-size:13vw}.lg-switch a{padding:9px 13px;font-size:10px}.lg-wrap{padding:40px 20px 80px}.lg-intro{font-size:18px}.lg-section h2{font-size:24px}.lg-body{font-size:15px}.lg-table table{font-size:14px;min-width:420px}.lg-business dl{grid-template-columns:1fr}}
+/* Phones: on pages with the fixed bottom booking bar, the footer's last lines (copyright, legal links) clear the bar instead of sitting under it */
+@media(max-width:800px){body:has(.dt-mobile-bar) .footer{padding-bottom:110px}}
