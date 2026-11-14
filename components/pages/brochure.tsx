@@ -5,6 +5,7 @@ import { useRef, useState, type FormEvent } from 'react'
 import type { DetailItem } from '@/components/pages/detail'
 import { brochurePdf } from '@/lib/brochure-pdf'
 import { track } from '@/lib/analytics'
+import { DOWNLOAD_BTN_ID, itineraryReady, mountItinerary } from '@/lib/booking/itinerary'
 
 const save = (href: string, name: string) => {
   const link = document.createElement('a')
@@ -13,13 +14,43 @@ const save = (href: string, name: string) => {
   link.click()
 }
 
-// The brochure opens a short form; a name and number are asked for first, then the PDF downloads.
-// The event's logout.world brochure is used when there is one (it arrives as an attachment, so the page stays put),
-// otherwise a PDF is made from the page
+// The event behind a logout.world brochure link
+const eventOf = (brochure?: string) => {
+  const slug = brochure?.match(/^https:\/\/logout\.world\/tours\/([^/?#]+)\/pdf\//)?.[1]
+  return slug && decodeURIComponent(slug)
+}
+
+// For an event on logout.world, the button opens logout.world's itinerary form (its booking widget, kept hidden),
+// which takes the guest's details and downloads the event's PDF. The widget loads when the visitor points at or
+// focuses the button; until it is ready, or if it can't load, the button opens our own form below.
+// Our form asks for a name and number, then the PDF downloads: the event's logout.world brochure when there is one
+// (it arrives as an attachment, so the page stays put), otherwise a PDF made from the page
 export function Brochure({ item }: { item: DetailItem }) {
   const dialog = useRef<HTMLDialogElement>(null)
+  const button = useRef<HTMLButtonElement>(null)
+  const opening = useRef(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const event = eventOf(item.brochure)
+
+  const warm = () => { if (event && button.current) mountItinerary(event, button.current).catch(() => {}) }
+
+  async function open() {
+    const el = button.current
+    if (!event || !el) return dialog.current?.showModal()
+    // Once the widget is listening to this button, its own click handler opens its form
+    if (itineraryReady(event, el)) return track('brochure_open', { product: item.title, via: 'logout' })
+    if (opening.current) return
+    opening.current = true
+    try {
+      await Promise.race([mountItinerary(event, el), new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 15000))])
+      if (el.isConnected) el.click()
+    } catch {
+      dialog.current?.showModal()
+    } finally {
+      opening.current = false
+    }
+  }
 
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -47,7 +78,7 @@ export function Brochure({ item }: { item: DetailItem }) {
   }
 
   return <>
-    <button type="button" className="dt-card-brochure" onClick={() => dialog.current?.showModal()}><FileDown /> Download brochure <small>PDF</small></button>
+    <button ref={button} id={event ? DOWNLOAD_BTN_ID : undefined} type="button" className="dt-card-brochure" onPointerEnter={warm} onFocus={warm} onTouchStart={warm} onClick={open}><FileDown /> Download brochure <small>PDF</small></button>
     <dialog ref={dialog} className="bc" aria-labelledby="bc-title" onClick={e => { if (e.target === dialog.current) dialog.current.close() }}>
       <button type="button" className="bp-close" onClick={() => dialog.current?.close()} aria-label="Close"><X /></button>
       <form className="bp-form" onSubmit={submit}>
