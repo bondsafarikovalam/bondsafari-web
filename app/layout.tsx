@@ -19,4 +19,5 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { colorScheme: 'light', themeColor: '#082D3A', width: 'device-width', initialScale: 1 }
 const display = Jost({ subsets: ['latin'], weight: ['300', '400'], variable: '--font-display' })
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="en" className={display.variable}><body><JsonLd data={localBusinessLd()} /><MotionProvider>{children}<Footer /><Widgets /></MotionProvider>{process.env.VERCEL === '1' && <Analytics />}</body></html> }
+// suppressHydrationWarning on <body> only: browser extensions (e.g. ColorZilla's cz-shortcut-listen) add attributes to it before React loads. It covers the body tag's own attributes, not its children
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) { return <html lang="en" className={display.variable}><body suppressHydrationWarning><JsonLd data={localBusinessLd()} /><MotionProvider>{children}<Footer /><Widgets /></MotionProvider>{process.env.VERCEL === '1' && <Analytics />}</body></html> }

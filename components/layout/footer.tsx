@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { ArrowUpRight, Clock, Mail, MapPin, Phone } from 'lucide-react'
 import { contact, socials, whatsappLink } from '@/data/site'
 import { SocialIcon } from '@/components/layout/social-icons'
+import { legalDocs } from '@/data/legal'
 
 // Static markup only, so it renders on the server and ships no JavaScript
 
@@ -26,6 +27,6 @@ export function Footer() {
       </ul>
     </div>
     <div><p className="eyebrow">Follow along</p><ul className="footer-social">{socials.map(([label, href]) => <li key={label}><a href={href} target="_blank" rel="noreferrer" aria-label={`Bond Safari on ${label}`} title={label}><SocialIcon label={label} /></a></li>)}</ul></div>
-    <div className="footer-bottom">© {new Date().getFullYear()} Bond Safari Kovalam <span>In partnership with Cool Divers SL, Spain · <Link href="/faq">FAQ</Link></span></div>
+    <div className="footer-bottom">© {new Date().getFullYear()} Bond Safari Kovalam <span>In partnership with Cool Divers SL, Spain · <Link href="/faq">FAQ</Link></span><nav className="footer-legal" aria-label="Legal">{legalDocs.map(d => <Link key={d.slug} href={`/${d.slug}`}>{d.title}</Link>)}</nav></div>
   </footer>
 }

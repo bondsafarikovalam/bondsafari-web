@@ -45,6 +45,7 @@ function Card({ e, i, now }: { e: Experience; i: number; now?: number }) {
   const soon = now !== undefined && status === 'bookable' ? nextDeparture(e.slug, now) : undefined
   return <m.article layout={!reduce} className={`tg-card${status === 'paused' ? ' is-paused' : ''}`}
     initial={{ opacity: 0, y: reduce ? 0 : 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: reduce ? 1 : 0.96 }}
+    whileHover={reduce ? undefined : { y: -6, transition: { duration: 0.4, ease } }}
     transition={{ duration: reduce ? 0 : 0.5, ease, delay: reduce ? 0 : Math.min(i, 7) * 0.04 }}>
     <div className="tg-media">
       <Image src={e.image} alt="" fill sizes="(max-width: 800px) 80vw, (max-width: 1100px) 33vw, 25vw" style={{ objectPosition: e.imagePosition }} />
@@ -98,7 +99,8 @@ export function ExperienceStack({ initial = [] }: { initial?: Experience[] }) {
         </div>
         <p className="xp-filter-count" aria-live="polite">Showing <b>{shown.length}</b> of {list.length}</p>
       </div>
-      <m.div layout className="tg-grid">
+      {/* layoutScroll: on phones this row scrolls sideways, and Framer must allow for that or cards jump by the scrolled distance on re-render */}
+      <m.div layout layoutScroll className="tg-grid">
         <AnimatePresence mode="popLayout">{shown.map((e, i) => <Card key={e.slug} e={e} i={i} now={now} />)}</AnimatePresence>
       </m.div>
     </LayoutMotion>
