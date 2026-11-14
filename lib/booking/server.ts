@@ -1,3 +1,4 @@
+import 'server-only'
 import { createHmac, timingSafeEqual } from 'node:crypto'
 
 // Server-only: imported by app/api/* route handlers and server components. Reads secrets that must never reach

@@ -3,10 +3,11 @@
 import Image from '@/components/ui/photo'
 import Link from 'next/link'
 import { m } from 'framer-motion'
-import { ArrowRight, Clock, Newspaper } from 'lucide-react'
+import { ArrowDown, ArrowRight, Clock, Newspaper } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { postDate, storyMonth, type Card, type StoryCard } from '@/data/blog'
-import { PageIntro } from '@/components/pages/pages'
+import { Header } from '@/components/layout/header'
+import { Mask, enter } from '@/components/layout/intro'
 
 const ease = [0.19, 1, 0.22, 1] as const
 const rise = { hidden: { opacity: 0, y: 40 }, show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 1, ease, delay: i * 0.08 } }) }
@@ -44,6 +45,17 @@ export function StoryCardView({ s, i }: { s: StoryCard; i: number }) {
   </m.article>
 }
 
+// Blog hero: simple and centred. Eyebrow, title, one line of copy and a link down to the stories
+function BlogHero({ total }: { total: number }) {
+  return <section className="bh">
+    <div className="bh-media" aria-hidden="true"><Image src="/images/coral-reef.webp" alt="" fill sizes="100vw" priority /></div>
+    <p className={`eyebrow light ${enter({ y: 12, duration: 1, delay: 0.2 }).className}`} style={enter({ y: 12, duration: 1, delay: 0.2 }).style}>Blog &amp; news</p>
+    <h1><Mask delay={0.3}>Stories from</Mask><br /><Mask delay={0.45}><i>beneath the waves.</i></Mask></h1>
+    <p className={`bh-text ${enter({ y: 16, duration: 1.2, delay: 0.7 }).className}`} style={enter({ y: 16, duration: 1.2, delay: 0.7 }).style}>Diving guides, seasonal tips and the headlines Kovalam’s sea has made.</p>
+    <a className={`bh-scroll ${enter({ duration: 1.2, delay: 1 }).className}`} style={enter({ duration: 1.2, delay: 1 }).style} href="#stories">Read {total} stories <ArrowDown /></a>
+  </section>
+}
+
 // Blog articles and press coverage on one page; /news and /blog#news open straight on the coverage
 export function BlogPage({ posts, news }: { posts: Card[]; news: StoryCard[] }) {
   const [tab, setTab] = useState<Tab>('all')
@@ -57,9 +69,10 @@ export function BlogPage({ posts, news }: { posts: Card[]; news: StoryCard[] }) 
   const [lead, ...more] = posts
 
   return <main className="bl">
-    <PageIntro eyebrow="Blog & news" title={<>Stories from<br /><i>beneath the waves.</i></>} copy="Diving guides and seasonal tips from our instructors, and the headlines Kovalam’s sea has made — from India’s first underwater wedding to the world’s first underwater CEO conference." image="/images/coral-reef.webp" />
+    <Header />
+    <BlogHero total={posts.length + news.length} />
 
-    <section className="bl-wrap">
+    <section id="stories" className="bl-wrap">
       <div className="bk-tabs bl-tabs" role="tablist" aria-label="Show">
         {tabs.map(([id, label]) => <button key={id} type="button" role="tab" aria-selected={tab === id} className={tab === id ? 'is-on' : ''} onClick={() => choose(id)}>
           {label}<em>{id === 'all' ? posts.length + news.length : id === 'blog' ? posts.length : news.length}</em>

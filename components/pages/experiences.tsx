@@ -35,7 +35,7 @@ function Card({ e, index }: { e: Experience; index: number }) {
   const cta = ctaOf(e.title, statusOf(e.slug))
   // Only the activity's cover from the events API (logout.world); without one the card keeps a plain background
   const cover = /^https?:\/\//i.test(e.image) ? e.image : undefined
-  return <m.article layout className="xp-card" initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96 }} transition={{ duration: 0.8, ease, delay: Math.min(index, 6) * 0.06 }}>
+  return <m.article layout className="xp-card" initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96 }} whileHover={{ y: -4, transition: { duration: 0.5, ease } }} transition={{ duration: 0.8, ease, delay: Math.min(index, 6) * 0.06 }}>
     <Link className="xp-card-media" href={`/activities/${e.slug}`} aria-label={`${e.title} — view details`}>
       {cover && <Image src={cover} alt="" fill sizes="(max-width: 800px) 100vw, (max-width: 1100px) 50vw, 33vw" />}
       <span className="xp-card-num">{String(index + 1).padStart(2, '0')}</span>

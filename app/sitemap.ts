@@ -4,12 +4,14 @@ import { landingPages } from '@/data/landing'
 import { programmes } from '@/data/programmes'
 import { posts, stories } from '@/data/blog'
 import { abs } from '@/lib/seo'
+import { LEGAL_APPROVED, legalDocs } from '@/data/legal'
 import { listActivities, listCourses } from '@/lib/api/events-server'
 
 export const revalidate = 3600
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const pages = ['/', '/activities', '/courses', '/about', '/gallery', '/blog', '/faq', '/contact']
+  // The legal pages join once approved (data/legal.ts); until then they are noindex drafts
+  const pages = ['/', '/activities', '/courses', '/about', '/gallery', '/blog', '/faq', '/contact', ...(LEGAL_APPROVED ? legalDocs.map(d => `/${d.slug}`) : [])]
   // Activities and courses are the API's published ones only (other pages redirect to their list). Only when the API
   // returns nothing do the site's own catalogue pages stand in, matching what the pages themselves show then
   const [activities, courses] = await Promise.all([listActivities(), listCourses()])

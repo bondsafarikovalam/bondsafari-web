@@ -60,7 +60,7 @@ export function Hero() {
     {/* Fade only: a transform here would trap the fixed header inside the hero */}
     <div className={`hero-header ${enter({ duration: 1.5, delay: 1.2 }).className}`} style={enter({ duration: 1.5, delay: 1.2 }).style}><Header /></div>
     <div className="hero-center">
-      <span className={`hero-mark ${enter({ y: 50, duration: 1.5, delay: 0.4 }).className}`} style={enter({ y: 50, duration: 1.5, delay: 0.4 }).style}>BS</span>
+      <span className={`hero-mark ${enter({ y: 50, duration: 1.5, delay: 0.4 }).className}`} style={enter({ y: 50, duration: 1.5, delay: 0.4 }).style}><Image src="/images/logo.webp" alt="Bond Safari Kovalam" width={447} height={320} sizes="160px" priority /></span>
       {/* The tagline sits inside the h1 so the heading carries "scuba diving in Kerala" for search, without changing the look */}
       <h1><span className="hero-title"><Mask delay={0.6}>Bond Safari</Mask></span><span className="hero-tagline"><Mask delay={0.85}>Underwater scooter rides &amp; scuba diving in Kerala</Mask></span></h1>
     </div>

@@ -274,6 +274,95 @@ export const faqGroups: FaqGroup[] = [
       ],
     },
   },
+  {
+    id: 'kayaking', title: 'Kayaking', subtitle: 'Backwater & Freshwater Kayaking', image: '/images/kayaking-quarry.webp',
+    faqs: [
+      {
+        q: 'What is kayaking, and do I need prior experience?', a: [
+          'Kayaking is an exciting water adventure where you paddle through the water using a double-bladed paddle while seated in a kayak. It is a wonderful way to explore scenic waterways, enjoy nature and experience the beauty of Kerala\'s water landscapes.',
+          'No prior kayaking experience is required. Our team will provide a basic safety briefing and instructions on paddling before the activity begins.',
+        ],
+      },
+      {
+        q: 'Where will the backwater and freshwater kayaking experiences take place?', a: [
+          { sub: 'Bond Safari offers two different kayaking experiences based on the guest\'s preference and location availability:' },
+          { list: ['Backwater Kayaking: Conducted in the beautiful Kovalam backwaters, offering a scenic experience through peaceful waterways surrounded by natural landscapes.', 'Freshwater Kayaking: Conducted in a freshwater quarry, providing a calm and unique kayaking experience away from the sea.'] },
+          'The location will be finalised based on availability and the guest\'s choice at the time of booking.',
+        ],
+      },
+      {
+        q: 'What is the difference between backwater kayaking and freshwater kayaking?', a: [
+          'Both experiences offer a unique opportunity to explore nature from the water.',
+          { list: ['Backwater Kayaking: Enjoy paddling through the scenic Kovalam backwaters, surrounded by beautiful landscapes and peaceful waterways.', 'Freshwater Kayaking: Experience kayaking in a freshwater quarry, enjoying a different natural setting with calm freshwater surroundings.'] },
+          'Guests can choose their preferred experience depending on location availability.',
+        ],
+      },
+      {
+        q: 'Is kayaking suitable for beginners?', a: [
+          'Absolutely! Our kayaking experiences are suitable for beginners as well as experienced paddlers. Before starting, our team will explain the basic paddling techniques, kayak handling and safety instructions. Our instructors will guide you throughout the activity to help you enjoy a comfortable experience.',
+        ],
+      },
+      {
+        q: 'What types of kayaks are available?', a: [
+          { sub: 'Bond Safari offers single and double kayaks, subject to availability at the selected location.' },
+          { list: ['Single Kayak: Suitable for one participant.', 'Double Kayak: Suitable for two participants who wish to enjoy the experience together.'] },
+          'Our team will help you select the appropriate kayak based on availability and your preference.',
+        ],
+      },
+      {
+        q: 'How long does the kayaking experience last?', a: [
+          'The overall kayaking experience lasts approximately 1 to 1.5 hours, depending on the selected location, route and water conditions. This includes the necessary instructions and time to enjoy the kayaking experience.',
+        ],
+      },
+      {
+        q: 'What safety equipment will be provided?', a: [
+          { sub: 'Bond Safari provides the necessary kayaking equipment and safety gear to ensure a safe experience, including:' },
+          { list: ['Kayak (single or double, depending on availability)', 'Double-bladed paddle', 'Life jacket', 'Basic safety instructions and guidance from our team'] },
+          'Wearing a life jacket throughout the activity is mandatory.',
+        ],
+      },
+      {
+        q: 'What should I wear or carry for kayaking?', a: [
+          'We recommend wearing comfortable clothing suitable for water activities, as you may get wet during the experience.',
+          'Please consider bringing:',
+          { list: ['Comfortable swimwear or quick-dry clothing', 'A towel', 'An extra set of clothes', 'Water-resistant footwear, if available', 'Eco-friendly sunscreen to protect your skin while minimising environmental impact', 'A water bottle'] },
+          'Avoid carrying valuables, jewellery or electronic devices unless they are properly protected against water.',
+        ],
+      },
+      {
+        q: 'Can children participate in kayaking?', a: [
+          'Yes, children can participate depending on their age, physical suitability and the availability of appropriate kayaks. All children must wear life jackets and follow the safety instructions provided by our team.',
+          'Double kayaking with an accompanying adult may be recommended where suitable. Please contact our team in advance to confirm suitability.',
+        ],
+      },
+      {
+        q: 'Do I need to know swimming to participate in kayaking?', a: [
+          'Swimming is not mandatory to participate in kayaking with Bond Safari. However, all participants must wear life jackets throughout the activity and follow the safety instructions provided by our team.',
+        ],
+      },
+      {
+        q: 'What happens if the weather conditions are unsuitable for kayaking?', a: [
+          'Kayaking activities depend on weather, wind, water levels and other environmental conditions. If conditions are unsuitable for the activity, Bond Safari may postpone or reschedule the experience to ensure guest safety. Our operations team will inform guests about the available alternatives.',
+        ],
+      },
+    ],
+    notes: {
+      title: 'Important Notes for Guests – Kayaking', items: [
+        'Please arrive at the activity location at least 15 minutes before your scheduled time.',
+        'The kayaking experience lasts approximately 1 to 1.5 hours.',
+        'Backwater kayaking takes place in Kovalam backwaters.',
+        'Freshwater kayaking takes place in a quarry, subject to availability.',
+        'The location is finalised based on availability and guest preference.',
+        'Wearing a life jacket is mandatory throughout the activity.',
+        'Follow all safety instructions provided by the kayaking team.',
+        'Avoid standing up or making sudden movements inside the kayak.',
+        'Please use eco-friendly sunscreen to minimise environmental impact.',
+        'Do not litter or disturb the natural surroundings.',
+        'Inform our team about any relevant medical conditions before participating.',
+        'All activities are subject to suitable weather and water conditions.',
+      ],
+    },
+  },
 ]
 
 // An answer as plain text, for search and for the FAQPage structured data
